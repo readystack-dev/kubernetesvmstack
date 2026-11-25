@@ -1,0 +1,41 @@
+# The KubeVirt custom resource for the Kubernetes VM Stack.
+# Source: https://github.com/kubevirt/kubevirt/releases/download/v1.9.1/kubevirt-cr.yaml
+#   (sha256 43106136dbce3312bdbfdeae612aacafc6c12da518d233f90645b4685d84a2af), plus spec.customizeComponents
+#   (virt-handler's root), an explicit useEmulation: false and virtTemplateDeployment.enabled: false. Images come
+#   from virt-operator's environment (kubevirt-operator.yaml), so the CR names none.
+---
+apiVersion: kubevirt.io/v1
+kind: KubeVirt
+metadata:
+  name: kubevirt
+  namespace: kubevirt
+spec:
+  certificateRotateStrategy: {}
+  configuration:
+    developerConfiguration:
+      featureGates: []
+      # useEmulation (off, the default): VMs need hardware virtualization (/dev/kvm) on the node, which nested
+      # virtualization provides; set useEmulation: true only where a node has none (QEMU TCG, slow).
+      useEmulation: false
+    imagePullPolicy: IfNotPresent
+    # The Template feature gate is Beta in v1.9.1, so it is on by default (pkg/virt-config/featuregate/active.go), and
+    # virt-operator would then deploy virt-template-apiserver and virt-template-controller (v0.2.3), which the stack
+    # does not ship, and wait for them: without this switch KubeVirt never reports Available. The
+    # dedicated switch turns only that deployment off (pkg/virt-operator/util/config.go reads
+    # virtTemplateDeployment.enabled).
+    virtTemplateDeployment:
+      enabled: false
+  customizeComponents:
+    patches:
+    # ReadyStack images default to a non-root user; virt-handler needs root, which the pod sets (never the image).
+    # virt-operator writes the virt-handler DaemonSet with privileged: true but no runAsUser on its main
+    # container (pkg/virt-operator/resource/generate/components/daemonsets.go), so this patch sets runAsUser: 0
+    # there. Its node-labeller init container (named virt-launcher, from the virt-launcher image) already gets
+    # runAsUser: 0 from virt-operator; the patch states it too, so the root this pod needs is all in one place.
+    # Without this patch virt-handler starts as uid 107 and fails at once with "permission denied".
+    - resourceType: DaemonSet
+      resourceName: virt-handler
+      type: strategic
+      patch: '{"spec":{"template":{"spec":{"containers":[{"name":"virt-handler","securityContext":{"runAsUser":0}}],"initContainers":[{"name":"virt-launcher","securityContext":{"runAsUser":0}}]}}}}'
+  imagePullPolicy: IfNotPresent
+  workloadUpdateStrategy: {}

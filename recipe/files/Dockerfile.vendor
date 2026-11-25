@@ -1,0 +1,10 @@
+# =====================================================================
+# Kubernetes VM Stack VENDOR STAGE. The image's content is ReadyStack's own: the install bundle, the pin manifest and
+# the operator runbook, which the kit carries in bundle/ (scripts/stack-bundle.py sync, from
+# product-kits/kubevirt-stack/install/, registry/stacks/kubevirt-stack.json and the runbook's committed run). Nothing is
+# downloaded: the export stage copies bundle/ to vendored/kubernetesvmstack-src, which Dockerfile.offline.pinned builds
+# from with --network=none.
+# Export (assemble_kit): docker build -f Dockerfile.vendor --target export, then docker cp the image's / into ./vendored
+# =====================================================================
+FROM scratch AS export
+COPY bundle/ /kubernetesvmstack-src/

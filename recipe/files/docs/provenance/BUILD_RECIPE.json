@@ -1,0 +1,25 @@
+{
+  "schema": "kitforge.build_recipe.v1",
+  "slug": "kubernetesvmstack",
+  "image": "readystack/kubernetesvmstack:v1.36.6-kubevirt1.9.1-CE-scratch-r3",
+  "build_method": "source-rebuild-go",
+  "source": {
+    "repo": "https://github.com/kubernetes/kubernetes",
+    "ref": "v1.36.6",
+    "commit": "1b2171b110bb2a2542e1322035c6583ec86eb976",
+    "_note": "The pipeline's acquire stage needs one upstream repository: Kubernetes at v1.36.6, the line the stack's version leads with (as for kubernetesnode). The image compiles none of it: its content is ReadyStack's install bundle and the upstream release manifests in it (each pinned in the manifest's components[]).",
+    "source_date_epoch": 1793102572,
+    "source_date_epoch_provenance": "committer date of 1b2171b110bb2a2542e1322035c6583ec86eb976, the commit tag v1.36.6 points to (2026-10-27T12:02:52Z), as registry/stacks/kubevirt-stack.json pins it (components[kubernetes].committed): the stack's version leads with its Kubernetes version."
+  },
+  "product_kind": "stack",
+  "binaries_from_source": [
+    {
+      "name": "stack-bundle",
+      "main_pkg": ".",
+      "ldflags": "-s -w -X main.version=v1.36.6-kubevirt1.9.1",
+      "out_path": "/usr/local/bin/stack-bundle",
+      "_note": "from the kit's stack-bundle.go, not from the acquired source"
+    }
+  ],
+  "runtime_packages": []
+}

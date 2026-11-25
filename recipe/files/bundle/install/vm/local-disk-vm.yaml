@@ -1,0 +1,90 @@
+# A KubeVirt VM from an existing disk on a static local volume, for the Kubernetes VM Stack: the stack's VM disks are
+# static local volumes that you fill yourself. One NIC on the pod network (masquerade) and one on a host bridge through
+# Multus (network/nad-host-bridge.yaml in this bundle, bridge binding). Proven by the integration test, which renders
+# this file.
+#
+# Before applying, on the node ${VM_NODE}:
+#   1. the disk as a RAW image named disk.img in ${VM_DISK_DIR} (qemu-img convert -O raw <image> disk.img), owned by
+#      107:107 (KubeVirt's virt-launcher runs the VM as uid 107) and mode 0660:
+#        mkdir -p ${VM_DISK_DIR} && mv disk.img ${VM_DISK_DIR}/ && chown -R 107:107 ${VM_DISK_DIR} && chmod 0660 ${VM_DISK_DIR}/disk.img
+#   2. the host bridge the NetworkAttachmentDefinition names (on every node the VM may run on; a local volume pins it
+#      to ${VM_NODE}).
+# The local PersistentVolume pins the VM to ${VM_NODE}: it cannot live-migrate, and it stops while that node is down.
+#
+# Placeholders (envsubst):
+#   ${VM_NAME}        the VM's name (also names its PV/PVC: ${VM_NAME}-disk)
+#   ${VM_NAMESPACE}   its namespace (the NetworkAttachmentDefinition must be in the same one)
+#   ${VM_NODE}        the node holding the disk (kubernetes.io/hostname)
+#   ${VM_DISK_DIR}    the directory holding disk.img on that node
+#   ${VM_DISK_SIZE}   the PV/PVC size (at least the disk's virtual size), e.g. 1Gi
+#   ${VM_CPUS}        vCPU cores
+#   ${VM_MEMORY}      guest memory, e.g. 256Mi
+#   ${NAD_NAME}       the NetworkAttachmentDefinition of the host bridge (host-bridge in nad-host-bridge.yaml)
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-static
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: ${VM_NAME}-disk
+spec:
+  capacity: {storage: ${VM_DISK_SIZE}}
+  accessModes: [ReadWriteOnce]
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-static
+  volumeMode: Filesystem
+  local: {path: ${VM_DISK_DIR}}
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions: [{key: kubernetes.io/hostname, operator: In, values: [${VM_NODE}]}]
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ${VM_NAME}-disk
+  namespace: ${VM_NAMESPACE}
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: local-static
+  volumeName: ${VM_NAME}-disk
+  resources: {requests: {storage: ${VM_DISK_SIZE}}}
+---
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: ${VM_NAME}
+  namespace: ${VM_NAMESPACE}
+spec:
+  runStrategy: Always
+  template:
+    metadata:
+      labels: {kubevirt.io/vm: ${VM_NAME}}
+    spec:
+      domain:
+        cpu: {cores: ${VM_CPUS}}
+        memory: {guest: ${VM_MEMORY}}
+        devices:
+          disks:
+          - {name: rootdisk, disk: {bus: virtio}}
+          - {name: cloudinit, disk: {bus: virtio}}
+          interfaces:
+          - {name: default, masquerade: {}}
+          - {name: hostnet, bridge: {}}
+      networks:
+      - {name: default, pod: {}}
+      - {name: hostnet, multus: {networkName: ${NAD_NAME}}}
+      volumes:
+      - {name: rootdisk, persistentVolumeClaim: {claimName: ${VM_NAME}-disk}}
+      - name: cloudinit
+        cloudInitNoCloud:
+          userData: |
+            #!/bin/sh
+            # eth0 (pod network, masquerade) takes KubeVirt's DHCP at boot; eth1 (the host bridge) asks the bridge's
+            # DHCP server for a lease, with whichever client the guest has. Replace with the guest's own cloud-config.
+            ip link set eth1 up
+            udhcpc -i eth1 -n -q -t 10 -T 3 2>/dev/null || dhclient -1 eth1 2>/dev/null || dhcpcd -1 eth1 2>/dev/null || true

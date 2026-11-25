@@ -1,0 +1,9 @@
+# kubeadm patch file (kubeadm's naming: <target>[suffix][+patchtype].yaml; target kube-controller-manager, strategic
+# merge), read from /etc/kubernetes/patches by kubeadm init, join and upgrade (patches.directory in kubeadm-config.yaml).
+# Our kube-controller-manager image runs as the non-root user kube (999:999) by default (root is
+# set by the Pod). It reads /etc/kubernetes/controller-manager.conf and the root-only CA and service-account
+# keys under /etc/kubernetes/pki: without this patch it exits at start with "permission denied".
+spec:
+  securityContext:
+    runAsUser: 0
+    runAsGroup: 0

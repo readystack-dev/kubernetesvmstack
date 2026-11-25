@@ -1,0 +1,11 @@
+# kubeadm patch for the etcd static Pod (kubeadm init/join --patches <dir>; target "etcd", strategic merge patch).
+# readystack/etcd's default user is uid 999 (etcd), and kubeadm creates the /var/lib/etcd hostPath root-owned, mode 0700
+# (and reads the certificates under /etc/kubernetes/pki/etcd, root-owned 0600 keys), so etcd must run as root here:
+# root is set by the Pod, never by the image (controlplane/IMAGES.md, "How root is applied").
+# Without this patch etcd exits at once with "permission denied" on /var/lib/etcd.
+# It is the same patch as controlplane/patches/etcd+strategic.yaml: use either copy, in the one --patches directory
+# (/etc/kubernetes/patches) with the kube-apiserver, kube-controller-manager and kube-scheduler patches.
+spec:
+  securityContext:
+    runAsUser: 0
+    runAsGroup: 0

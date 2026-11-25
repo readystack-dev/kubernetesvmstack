@@ -1,0 +1,9 @@
+# kubeadm patch file (kubeadm's naming: <target>[suffix][+patchtype].yaml; target kube-apiserver, strategic merge),
+# read from /etc/kubernetes/patches by kubeadm init, join and upgrade (patches.directory in kubeadm-config.yaml).
+# Our kube-apiserver image runs as the non-root user kube (999:999) by default (root is set by the
+# Pod). kube-apiserver reads the root-only keys kubeadm writes under /etc/kubernetes/pki (ca.key, sa.key,
+# apiserver.key, ...): without this patch it exits at start with "permission denied".
+spec:
+  securityContext:
+    runAsUser: 0
+    runAsGroup: 0

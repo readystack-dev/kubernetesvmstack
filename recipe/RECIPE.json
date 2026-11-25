@@ -1,0 +1,487 @@
+{
+ "schema": "readystack.recipe.v1",
+ "slug": "kubernetesvmstack",
+ "tag": "v1.36.6-kubevirt1.9.1-CE-scratch-r3",
+ "tarball": "ReadyStack-kubernetesvmstack-v1.36.6-kubevirt1.9.1-CE-scratch-r3.tar.gz",
+ "tarball_sha256": "2f26ed35b1711f1f9918cacdd5962f4235c6e11d01db12944aad8c733357caed",
+ "kit_root": "v1.36.6-kubevirt1.9.1-CE-scratch-r3",
+ "generated_at": "2026-11-12T02:10:18Z",
+ "generator": "KitForge release/recipe_publish.py",
+ "dockerfile": "Dockerfile.offline.pinned",
+ "build_script": "BUILD_OFFLINE.sh",
+ "preview_lines": 24,
+ "pins": {
+  "upstream": {
+   "repo": "https://github.com/kubernetes/kubernetes",
+   "ref": "v1.36.6",
+   "commit": "1b2171b110bb2a2542e1322035c6583ec86eb976",
+   "url": "https://github.com/kubernetes/kubernetes/tree/1b2171b110bb2a2542e1322035c6583ec86eb976",
+   "from": "docs/provenance/BUILD_RECIPE.json"
+  },
+  "bases": [
+   {
+    "ref": "golang:1.26.10-bookworm@sha256:632dff7351799a5a9954a48dc06670ade72ee44e8c351cdc0e5a57af2fea21af",
+    "image": "golang:1.26.10-bookworm",
+    "digest": "sha256:632dff7351799a5a9954a48dc06670ade72ee44e8c351cdc0e5a57af2fea21af"
+   }
+  ],
+  "toolchain": {
+   "buildkit": "moby/buildkit:v0.31.2",
+   "buildkit_image_digest": "sha256:e0e67ea9c4bb07bdef683e29f70f3b623d1eb9c82274a9ec04e6bb0511449fb0",
+   "builder_images": [
+    "golang:1.26.10-bookworm@sha256:632dff7351799a5a9954a48dc06670ade72ee44e8c351cdc0e5a57af2fea21af"
+   ]
+  },
+  "build_method": "source-rebuild-go",
+  "source_date_epoch": 1793102572,
+  "source_date_epoch_utc": "2026-10-27T12:02:52Z",
+  "target": {
+   "image_manifest_digest": "sha256:ec9e9b8a463dbe23ef50afe9b608db2b9ddc2e2a23367a6e6d788435e096b0b4",
+   "config_digest": "sha256:1fd7e9139af282febb10ce09f8572ce7fdc13c6bf2040440f94f453e8ba1a200",
+   "image": "readystack/kubernetesvmstack:v1.36.6-kubevirt1.9.1-CE-scratch-r3"
+  },
+  "checksummed_files": 29350
+ },
+ "files": [
+  {
+   "path": "BASES.tsv",
+   "size": 143,
+   "sha256": "2723d349204e265669d4d19e2e96fc49d3c481b7b964999bae66afcba2519644",
+   "lines": 1,
+   "public": "full"
+  },
+  {
+   "path": "BUILD_OFFLINE.sh",
+   "size": 8856,
+   "sha256": "6ab4f08a6ec775b32d854f03413b30ecfe555ddba78cf0de956235f5a2a39542",
+   "lines": 162,
+   "public": "preview",
+   "preview_lines": 24
+  },
+  {
+   "path": "CHECKSUMS.sha256",
+   "size": 4880786,
+   "sha256": "a7bdee20150d5962317f06ac271b905b8711aad404e25ecd4f3af114bb5a4075",
+   "lines": 29350,
+   "public": "account",
+   "stored": "gzip"
+  },
+  {
+   "path": "DOCKERFILE_NAME.txt",
+   "size": 26,
+   "sha256": "9aadd1ede68e016a6f163c97befc5ff2fcdc8ebd4f84b108dba63cb195fa8c84",
+   "lines": 1,
+   "public": "full"
+  },
+  {
+   "path": "Dockerfile",
+   "size": 4346,
+   "sha256": "0a0cfb186f45f70f2c17206bfef4e881c56e7683e4714ef6edf6b84a79298b74",
+   "lines": 57,
+   "public": "account"
+  },
+  {
+   "path": "Dockerfile.offline",
+   "size": 4346,
+   "sha256": "0a0cfb186f45f70f2c17206bfef4e881c56e7683e4714ef6edf6b84a79298b74",
+   "lines": 57,
+   "public": "account"
+  },
+  {
+   "path": "Dockerfile.offline.pinned",
+   "size": 4346,
+   "sha256": "0a0cfb186f45f70f2c17206bfef4e881c56e7683e4714ef6edf6b84a79298b74",
+   "lines": 57,
+   "public": "preview",
+   "preview_lines": 24
+  },
+  {
+   "path": "Dockerfile.vendor",
+   "size": 805,
+   "sha256": "8c607589a53c98c0f33b06b90f2f49d4371a6da3750ca85b8fa4f6788b969a43",
+   "lines": 10,
+   "public": "account"
+  },
+  {
+   "path": "FILE_MODES.tsv",
+   "size": 3491542,
+   "sha256": "714a102565d5472cd0313360a6277fbc232dc9d01a70398a83845da3fe6d64b5",
+   "lines": 35268,
+   "public": "account",
+   "stored": "gzip"
+  },
+  {
+   "path": "MANIFEST.txt",
+   "size": 2885016,
+   "sha256": "dafb021f8396f105c06bcb5aeee58434df4f01e81318566f0e836fb3f5671410",
+   "lines": 29352,
+   "public": "account",
+   "stored": "gzip"
+  },
+  {
+   "path": "README.md",
+   "size": 3448,
+   "sha256": "5d439ac6b1089579a1e39beadf2cd6f7ece054959477964cc4f148925150802f",
+   "lines": 39,
+   "public": "account"
+  },
+  {
+   "path": "SOURCE_DATE_EPOCH.txt",
+   "size": 11,
+   "sha256": "1baf07802daf74bb53895a5dc126efadea088eaec3460ac65cf3d9b9ca460a3c",
+   "lines": 1,
+   "public": "full"
+  },
+  {
+   "path": "TARGET_DIGEST.txt",
+   "size": 477,
+   "sha256": "759b4cd3683083dd1814d1d6aaedb07dba7d164fd0a707d0d4caf454d73fbb91",
+   "lines": 11,
+   "public": "full"
+  },
+  {
+   "path": "VERIFY_OFFLINE.sh",
+   "size": 10153,
+   "sha256": "3e8184ea230cfd8f41f977e26be6bf7bd03112c396c517837ce0c7de4f7399dd",
+   "lines": 165,
+   "public": "account"
+  },
+  {
+   "path": "bundle/SHA256SUMS",
+   "size": 2654,
+   "sha256": "a70e4180b7347184dce1d4a39b012fbe9e2300616a401c3396d37960bab11239",
+   "lines": 26,
+   "public": "account"
+  },
+  {
+   "path": "bundle/install/README.md",
+   "size": 12711,
+   "sha256": "0abe19a8a9b95ced524a06880c5acbd89980790f7856bd6c612f63b06390e047",
+   "lines": 197,
+   "public": "account"
+  },
+  {
+   "path": "bundle/install/controlplane/IMAGES.md",
+   "size": 7548,
+   "sha256": "fa076a00de196b20688d082da8d87b51fb8f0f40b10302adb84a53144ed2eb46",
+   "lines": 98,
+   "public": "account"
+  },
+  {
+   "path": "bundle/install/controlplane/kube-proxy.yaml",
+   "size": 6450,
+   "sha256": "93fafdd28b703abf98de331984b8d43988184c56e72cd39c7934825034bf2969",
+   "lines": 225,
+   "public": "account"
+  },
+  {
+   "path": "bundle/install/controlplane/kubeadm-config.yaml",
+   "size": 4875,
+   "sha256": "84dd53510f72de6d81cd6fa22b62fb87be5fbeb293bf52b8e19f9dcb76361fba",
+   "lines": 110,
+   "public": "account"
+  },
+  {
+   "path": "bundle/install/controlplane/patches/etcd+strategic.yaml",
+   "size": 550,
+   "sha256": "425affb94fb2f5b53acdd65988d05307cd327d54f2b28ce6f7c3a711e6609497",
+   "lines": 9,
+   "public": "account"
+  },
+  {
+   "path": "bundle/install/controlplane/patches/kube-apiserver+strategic.yaml",
+   "size": 581,
+   "sha256": "efe651b17f375ebf8910a85584c2810042a624e59f74b2d5fb9db4983e2864d4",
+   "lines": 9,
+   "public": "account"
+  },
+  {
+   "path": "bundle/install/controlplane/patches/kube-controller-manager+strategic.yaml",
+   "size": 602,
+   "sha256": "6eacdefa08b2dc9b8596571cdaec6195289fb2fb26e349a4e58fb777ce2b8e48",
+   "lines": 9,
+   "public": "account"
+  },
+  {
+   "path": "bundle/install/controlplane/patches/kube-scheduler+strategic.yaml",
+   "size": 540,
+   "sha256": "0f0e6012a51b8548442dc02a0140734283a4a41f35892c3334e305e9f54a18c2",
+   "lines": 9,
+   "public": "account"
+  },
+  {
+   "path": "bundle/install/images.tsv",
+   "size": 3402,
+   "sha256": "f530f4f67201fdad6e32684353b6212674037332723d64e71fcdb50768eea200",
+   "lines": 29,
+   "public": "account"
+  },
+  {
+   "path": "bundle/install/kubevirt/README.md",
+   "size": 6038,
+   "sha256": "1a6301549a8f207ced810bde41914ea74018bb52694f383d954ff0f206227fbe",
+   "lines": 86,
+   "public": "account"
+  },
+  {
+   "path": "bundle/install/kubevirt/kubevirt-cr.yaml",
+   "size": 2482,
+   "sha256": "eebbe6707b8f4cbed69afb9a9264d65612b833e9837978df8fe5abb1c2918ead",
+   "lines": 41,
+   "public": "account"
+  },
+  {
+   "path": "bundle/install/kubevirt/kubevirt-operator.yaml",
+   "size": 498613,
+   "sha256": "884e1e2dbc9a6f1c11bf2384202b71c680ccfe9c37b572f739342bcd37a925f5",
+   "lines": 8780,
+   "public": "account",
+   "stored": "gzip"
+  },
+  {
+   "path": "bundle/install/mirror-images.sh",
+   "size": 12856,
+   "sha256": "8e3ef781eeacd8d9d651273cf18863b4687c40191f8f1f23a257486c39f54cad",
+   "lines": 196,
+   "public": "account"
+  },
+  {
+   "path": "bundle/install/network/bridge-netplan.example.yaml",
+   "size": 2424,
+   "sha256": "d4c6b6c95660dd86c7b279139abd1e9244bd43fff50463c1c72252a0b333a649",
+   "lines": 51,
+   "public": "account"
+  },
+  {
+   "path": "bundle/install/network/kube-flannel.yml",
+   "size": 6216,
+   "sha256": "e325180bc61bb0fda6ef10e806d1af500c736dc9439ebd3d9a976b79733c6df9",
+   "lines": 245,
+   "public": "account"
+  },
+  {
+   "path": "bundle/install/network/kube-vip-static-pod.sh",
+   "size": 4614,
+   "sha256": "cdbea5a4f9038c4c06a154be09b309383669740a65b44f2e0100f9a3827d83fc",
+   "lines": 71,
+   "public": "account"
+  },
+  {
+   "path": "bundle/install/network/kube-vip.yaml",
+   "size": 3007,
+   "sha256": "a9521c05986fa9b6f81ac250c6dcef4248c0750088f8189534e39720b35e335b",
+   "lines": 87,
+   "public": "account"
+  },
+  {
+   "path": "bundle/install/network/multus-daemonset.yml",
+   "size": 8583,
+   "sha256": "49d01b1425f96106c97ae1c07c943094b44191827e4802c456e42791f916f00a",
+   "lines": 264,
+   "public": "account"
+  },
+  {
+   "path": "bundle/install/network/nad-host-bridge.yaml",
+   "size": 1756,
+   "sha256": "f91c5bfcdbf2e06862d6bc4fe866bcee3bbc14720e4beef758a79a2c63770ccb",
+   "lines": 48,
+   "public": "account"
+  },
+  {
+   "path": "bundle/install/node/install-node.sh",
+   "size": 13104,
+   "sha256": "25f77a539661d972786998d96e59094269b2e01e5cd6aa7c205574bb5d3a9659",
+   "lines": 199,
+   "public": "account"
+  },
+  {
+   "path": "bundle/install/node/kubeadm-patches/etcd+strategic.yaml",
+   "size": 810,
+   "sha256": "78c5f7397a6c5a94870431ca0de19be9e8cfc8723bd41c0ec929c011ddbffd2d",
+   "lines": 11,
+   "public": "account"
+  },
+  {
+   "path": "bundle/install/node/registry.env.example",
+   "size": 383,
+   "sha256": "260ebb0afd7263a5f61878d59f41e66a2f485aec7e359fb59334f5d55f713ab6",
+   "lines": 7,
+   "public": "account"
+  },
+  {
+   "path": "bundle/install/vm/local-disk-vm.yaml",
+   "size": 3708,
+   "sha256": "fa67562ed6e1273f8ce88494da91ebe63825ea99145e158c29be305ad865520f",
+   "lines": 90,
+   "public": "account"
+  },
+  {
+   "path": "bundle/kubevirt-stack.json",
+   "size": 51516,
+   "sha256": "60d3580d38883fbef889db27233b764d8b4dd3ee7ea5bccf854ff48f6d992afc",
+   "lines": 777,
+   "redactions": [
+    {
+     "line": 548,
+     "kind": "internal host"
+    },
+    {
+     "line": 549,
+     "kind": "internal host"
+    },
+    {
+     "line": 629,
+     "kind": "internal host"
+    },
+    {
+     "line": 633,
+     "kind": "internal host"
+    }
+   ],
+   "kit_sha256": "7cc8a9e10c4d8aa303cb7114b625059aaa5482fdb0ce1be44c61ba0178a2d834",
+   "kit_size": 51416,
+   "public": "account"
+  },
+  {
+   "path": "bundle/runbook/RUNBOOK.md",
+   "size": 128990,
+   "sha256": "02890be455359180016e800bc4684cc78ada6589e3f5aa4054fc0d9364cc4921",
+   "lines": 2557,
+   "public": "account"
+  },
+  {
+   "path": "bundle/runbook/RUNBOOK_EVIDENCE.json",
+   "size": 138972,
+   "sha256": "7009b0bd5378e3c2e452c7c3e206c4e025d4dc1ec9dc88a1c9932d68629ea5c8",
+   "lines": 2366,
+   "redactions": [
+    {
+     "line": 7,
+     "kind": "internal host"
+    }
+   ],
+   "kit_sha256": "4f8a09a641e88882f986184803a1e53dfc6cfbb20e0b4540ecf449b1eb40f5be",
+   "kit_size": 138952,
+   "public": "account"
+  },
+  {
+   "path": "docs/PROVENANCE.md",
+   "size": 3045,
+   "sha256": "13b1dfa81fbd711382b55a8cd64ab7dcaaaf8a2cab66a579b8bce62b0350a603",
+   "lines": 37,
+   "public": "account"
+  },
+  {
+   "path": "docs/REBUILD.md",
+   "size": 6682,
+   "sha256": "567ade5d0aea1c2f5727504a562152acc4155578e1a086c5c3154dcce535e693",
+   "lines": 62,
+   "public": "account"
+  },
+  {
+   "path": "docs/VERIFY.md",
+   "size": 2069,
+   "sha256": "99f24be1c7bd55d745250a37d7f8efa61d94ebdf8ae077e6f29ed3b533b9a5ce",
+   "lines": 34,
+   "public": "account"
+  },
+  {
+   "path": "docs/provenance/BASE_IMAGE_DIGESTS.lock",
+   "size": 83,
+   "sha256": "dc5fcb5cb7fad14a9ecc1e015f36f5637985e17c4f245a5a0b232e6eb5ec4afd",
+   "lines": 2,
+   "public": "full"
+  },
+  {
+   "path": "docs/provenance/BUILD_RECIPE.json",
+   "size": 1343,
+   "sha256": "bb23b214d151f38beee1cf6c8ac10028b36b900fd8f02007ed273eb170f2b93a",
+   "lines": 25,
+   "public": "account"
+  },
+  {
+   "path": "docs/provenance/CUSTODY_INPUTS.json",
+   "size": 664,
+   "sha256": "df548e8ffb7c442b4d78119ac13aa4a308dcb53fca8a2b36057d7ca5da5cb3dc",
+   "lines": 17,
+   "public": "account"
+  },
+  {
+   "path": "docs/provenance/SOURCE_FILE_MANIFEST.json",
+   "size": 262261,
+   "sha256": "0bba737f1dc9c0e5cab8e0381f9cd0e9cb119ab7a7a0bdffa43e81bf8f35cd05",
+   "lines": 5007,
+   "public": "account",
+   "stored": "gzip"
+  },
+  {
+   "path": "docs/provenance/SOURCE_TREE_HASH.json",
+   "size": 323,
+   "sha256": "19d3ba68bff64e73a2b8d83a7b81174a50c10208e2eecf9e88d2e44875af8ea0",
+   "lines": 9,
+   "public": "full"
+  },
+  {
+   "path": "docs/provenance/SYSTEM_PINNING.lock",
+   "size": 1,
+   "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+   "lines": 1,
+   "public": "account"
+  },
+  {
+   "path": "docs/provenance/TOOLCHAIN.lock",
+   "size": 1177,
+   "sha256": "f4b7da5aaf6b9d4b214d503774808099a0e1d98898435fcd6784b382a9de2804",
+   "lines": 34,
+   "public": "account"
+  },
+  {
+   "path": "rebuild.json",
+   "size": 1268,
+   "sha256": "00ccb41cf0029ac95009b13dd68a2f47ceab2a686af7a00a92587f280e3a6540",
+   "lines": 37,
+   "public": "account"
+  },
+  {
+   "path": "stack-bundle.go",
+   "size": 4063,
+   "sha256": "69adb233d4ac582b15db917b0ac7f34c4d9cafc3ba42154c02be3dd288d69e50",
+   "lines": 162,
+   "public": "account"
+  },
+  {
+   "path": "stack-bundle.mod",
+   "size": 44,
+   "sha256": "6b7aefb039e5658bb8411d71c47ddd46f3dc357a61df20628ef406e12bdefb18",
+   "lines": 3,
+   "public": "account"
+  },
+  {
+   "path": "toolchain/BUILDKIT_TAG.txt",
+   "size": 22,
+   "sha256": "fcd530eeb02b063d2f047adad6eef896422a8e8d558513e5f09b2a262be32573",
+   "lines": 1,
+   "public": "full"
+  }
+ ],
+ "skipped": [],
+ "kit_adds": {
+  "bases": {
+   "files": 11,
+   "bytes": 296811899
+  },
+  "docs": {
+   "files": 29258,
+   "bytes": 248179686
+  },
+  "toolchain": {
+   "files": 1,
+   "bytes": 111529472
+  },
+  "vendored": {
+   "files": 27,
+   "bytes": 923865
+  }
+ },
+ "redacted_files": 2
+}

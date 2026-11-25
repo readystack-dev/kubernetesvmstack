@@ -1,0 +1,34 @@
+{
+  "apt_refresh": [],
+  "binaries_from_source": [
+    {
+      "ldflags": "-s -w -X main.version=v1.36.6-kubevirt1.9.1",
+      "main_pkg": ".",
+      "name": "stack-bundle",
+      "out_path": "/usr/local/bin/stack-bundle"
+    }
+  ],
+  "build_method": "source-rebuild-go",
+  "chain_id": 936,
+  "dep_bumps": [],
+  "expected_residuals": [],
+  "images": [
+    {
+      "digest": "sha256:632dff7351799a5a9954a48dc06670ade72ee44e8c351cdc0e5a57af2fea21af",
+      "ref": "golang:1.26.10-bookworm",
+      "role": "offline_builder"
+    }
+  ],
+  "mod_replaces": [],
+  "runtime_packages": [],
+  "schema": "kitforge.toolchain_lock.v1",
+  "slug": "kubernetesvmstack",
+  "source": {
+    "commit": "1b2171b110bb2a2542e1322035c6583ec86eb976",
+    "ref": "v1.36.6",
+    "repo": "https://github.com/kubernetes/kubernetes",
+    "source_date_epoch": 1793102572,
+    "source_date_epoch_provenance": "committer date of 1b2171b110bb2a2542e1322035c6583ec86eb976, the commit tag v1.36.6 points to (2026-10-27T12:02:52Z), as registry/stacks/kubevirt-stack.json pins it (components[kubernetes].committed): the stack's version leads with its Kubernetes version."
+  },
+  "version": "v1.36.6-kubevirt1.9.1"
+}

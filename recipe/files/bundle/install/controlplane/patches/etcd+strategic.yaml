@@ -1,0 +1,9 @@
+# kubeadm patch file (kubeadm's naming: <target>[suffix][+patchtype].yaml; target etcd, strategic merge), read from
+# /etc/kubernetes/patches by kubeadm init, join and upgrade (patches.directory in kubeadm-config.yaml).
+# Our etcd image runs as a non-root user by default (root is set by the Pod).
+# etcd reads the root-only keys under /etc/kubernetes/pki/etcd and writes /var/lib/etcd, which kubeadm creates mode
+# 0700 root: without this patch it exits at start with "permission denied".
+spec:
+  securityContext:
+    runAsUser: 0
+    runAsGroup: 0

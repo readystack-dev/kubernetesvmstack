@@ -1,0 +1,110 @@
+# kubeadm configuration template for the Kubernetes VM Stack (its versions are pinned in the stack's pin manifest,
+# kubevirt-stack.json beside this bundle): kubeadm v1.36.6, config API kubeadm.k8s.io/v1beta4.
+#
+# Placeholders (the install bundle substitutes them, e.g. with envsubst; every one must be set):
+#   ${LOCAL_REGISTRY}    the local registry's host[:port], e.g. 10.77.0.1:5000: the registry ROOT, where the mirror
+#                        script (mirror-images.sh) copies our images under kubeadm's names (IMAGES.md). It must be the
+#                        same value as install-node.sh's REGISTRY_HOST: the node's containerd config names the sandbox
+#                        image <REGISTRY_HOST>/pause:3.10.2, so a path below the root (e.g. host:5000/k8s) would make
+#                        kubeadm and containerd name two different pause images
+#   ${KUBE_VIP}          the control-plane virtual IP kube-vip holds (port 6443)
+#   ${NODE_IP}           this node's own address (the API server advertises it; etcd peers use it)
+#   ${TAG_etcd}          the tag the mirror gives our etcd image: v3.7.3 (readystack/etcd:v3.7.3-CE-ubuntu24.04-r1)
+#   ${BOOTSTRAP_TOKEN}   a bootstrap token (kubeadm token generate), shared by init and the joins
+#   ${CERTIFICATE_KEY}   the key that encrypts the uploaded control-plane certificates (kubeadm certs certificate-key)
+#   ${CA_CERT_HASH}      sha256:<hex> of the cluster CA's public key, printed by kubeadm init (joins only)
+#
+# Use:
+#   first node:  kubeadm init --config kubeadm-config.yaml --upload-certs
+#   other control-plane nodes: kubeadm join --config kubeadm-config.yaml
+#   after the last join: kubectl -n kube-system rollout restart deployment/coredns
+#     (kubeadm init schedules both CoreDNS replicas on the first node, the only node then, and their anti-affinity is
+#     only preferred, so nothing moves them: without the restart, losing the first node stops cluster DNS)
+# Each command reads its own document (init: InitConfiguration + ClusterConfiguration + KubeletConfiguration; join:
+# JoinConfiguration; upgrade: UpgradeConfiguration) and ignores the others with a warning.
+#
+# Root for the control plane: every image runs as the non-root user kube (999:999) by default, and root is set by the
+# Pod: the patch files in /etc/kubernetes/patches (patches/ here) give the static Pods of kube-apiserver,
+# kube-controller-manager, kube-scheduler and etcd runAsUser: 0 / runAsGroup: 0. kube-proxy is not deployed by kubeadm
+# (skipPhases addon/kube-proxy): apply kube-proxy.yaml, kubeadm's own DaemonSet plus runAsUser: 0, after init.
+apiVersion: kubeadm.k8s.io/v1beta4
+kind: InitConfiguration
+bootstrapTokens:
+- token: "${BOOTSTRAP_TOKEN}"
+  description: "kubeadm bootstrap token for the Kubernetes VM Stack joins"
+  ttl: 24h0m0s
+  usages:
+  - signing
+  - authentication
+  groups:
+  - system:bootstrappers:kubeadm:default-node-token
+certificateKey: "${CERTIFICATE_KEY}"
+localAPIEndpoint:
+  advertiseAddress: "${NODE_IP}"
+  bindPort: 6443
+nodeRegistration:
+  criSocket: unix:///run/containerd/containerd.sock
+  imagePullPolicy: IfNotPresent
+  # The stack is three control-plane nodes and nothing else, so its workloads (KubeVirt's virt-handler, every VM's
+  # virt-launcher Pod) run on them: no node-role.kubernetes.io/control-plane:NoSchedule taint.
+  taints: []
+skipPhases:
+- addon/kube-proxy
+patches:
+  directory: /etc/kubernetes/patches
+---
+apiVersion: kubeadm.k8s.io/v1beta4
+kind: ClusterConfiguration
+kubernetesVersion: v1.36.6
+clusterName: kubernetes
+controlPlaneEndpoint: "${KUBE_VIP}:6443"
+imageRepository: "${LOCAL_REGISTRY}"
+apiServer:
+  certSANs:
+  - "${KUBE_VIP}"
+etcd:
+  local:
+    imageTag: "${TAG_etcd}"
+    dataDir: /var/lib/etcd
+# dns: no imageTag override: kubeadm's own CoreDNS v1.14.2 (<imageRepository>/coredns:v1.14.2), the version its
+# corefile migration knows, so `kubeadm upgrade` can migrate the Corefile (a later CoreDNS fails its preflight).
+networking:
+  dnsDomain: cluster.local
+  serviceSubnet: 10.96.0.0/12
+  podSubnet: 10.244.0.0/16
+---
+apiVersion: kubelet.config.k8s.io/v1beta1
+kind: KubeletConfiguration
+cgroupDriver: systemd
+---
+apiVersion: kubeadm.k8s.io/v1beta4
+kind: JoinConfiguration
+discovery:
+  bootstrapToken:
+    apiServerEndpoint: "${KUBE_VIP}:6443"
+    token: "${BOOTSTRAP_TOKEN}"
+    caCertHashes:
+    - "${CA_CERT_HASH}"
+controlPlane:
+  localAPIEndpoint:
+    advertiseAddress: "${NODE_IP}"
+    bindPort: 6443
+  certificateKey: "${CERTIFICATE_KEY}"
+nodeRegistration:
+  criSocket: unix:///run/containerd/containerd.sock
+  imagePullPolicy: IfNotPresent
+  taints: []
+patches:
+  directory: /etc/kubernetes/patches
+---
+apiVersion: kubeadm.k8s.io/v1beta4
+kind: UpgradeConfiguration
+apply:
+  kubernetesVersion: v1.36.6
+  skipPhases:
+  - addon/kube-proxy
+  patches:
+    directory: /etc/kubernetes/patches
+node:
+  patches:
+    directory: /etc/kubernetes/patches

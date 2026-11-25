@@ -1,0 +1,29 @@
+# The images of the Kubernetes VM Stack, read by mirror-images.sh (next to this file). Tab-separated, one image a line:
+#   slug  release-tag  linux/amd64 image-manifest digest  aliases (comma-separated <name>:<tag> under the registry root, or -)
+# mirror-images.sh copies each image by digest to ${LOCAL_REGISTRY}/readystack/<slug>:<release-tag> (the name the network
+# and KubeVirt manifests use, pinned by digest there) and to each alias:
+#   - kubeadm's names (controlplane/IMAGES.md): kubeadm-config.yaml sets imageRepository to the registry root
+#     (${LOCAL_REGISTRY} = host[:port]), which is also where the node's containerd config looks for the sandbox image
+#     (<registry>/pause:3.10.2); etcd.local.imageTag is v3.7.3, and CoreDNS keeps kubeadm's own tag, v1.14.2;
+#   - KubeVirt's names (kubevirt/virt-operator, ...): virt-operator parses its registry from its own image name, and
+#     kubevirt-operator.yaml names each component ${LOCAL_REGISTRY}/kubevirt/<name>@<digest>.
+# Each digest is the linux/amd64 image manifest this install bundle was tested with. mirror-images.sh copies a source
+# (an OCI archive, or the release on Docker Hub) only when its linux/amd64 manifest is that digest, and refuses it
+# otherwise.
+kubeapiserver	v1.36.6-CE-ubuntu24.04-r2	sha256:5407936de875e728ca7b2826853ccb8f186c776300da4ddb4ace211b35ac6062	kube-apiserver:v1.36.6
+kubecontrollermanager	v1.36.6-CE-ubuntu24.04-r2	sha256:76b1be21fad73f4a416bf868bac3a8fe312c314f4df25e4aeabbe39ac5826d96	kube-controller-manager:v1.36.6
+kubescheduler	v1.36.6-CE-ubuntu24.04-r2	sha256:35158b727d4cbf5e2b15c39374ef1942dca98a1b4394ed2812953b443829f39f	kube-scheduler:v1.36.6
+kubeproxy	v1.36.6-CE-ubuntu24.04-r2	sha256:6c996278676c933a0b4b1f1eafa738d314e150117fbd7b4f1d5e5c2e95bdd58a	kube-proxy:v1.36.6
+pause	3.10.2-CE-scratch-r1	sha256:6b74cfa71db2c51e1a21e3342402d3993573ea02a0c85063897eda87958dca26	pause:3.10.2
+etcd	v3.7.3-CE-ubuntu24.04-r2	sha256:9a7eeb94f59ccd9fe6f5e1927aa9fe71804ee01b3e2c522bdc368074fd418d25	etcd:v3.7.3
+coredns	v1.14.2-CE-ubuntu24.04-r2	sha256:c777c878e9b29e7c7f4a86e392ffc591350ccf0c02c3d57d38c410f74b4c2eed	coredns:v1.14.2
+kubevip	v1.3.1-CE-ubuntu24.04-r2	sha256:4d386696413b5756606ff3ea0616ae0508191f84851518a5bdbd9774922943b4	-
+flannel	v0.28.10-CE-ubuntu24.04-r2	sha256:1c243ea251fb0ac6f44b31a2818def37c0b1e417f9d8ff359d62ff1beb6cd5bf	-
+flannelcniplugin	v1.9.1-flannel3-CE-ubuntu24.04-r1	sha256:4511acd7413d1e6fd78d3d712921d794cb820a3b62973512532d7b64f2cc4e8a	-
+multuscni	v4.3.2-CE-ubuntu24.04-r1	sha256:4f83336538e07ecb26828be35bc7cbd644c3f8d6ca539eaa11ff5ebcb018fc6f	-
+virtoperator	v1.9.1-CE-debian12-r2	sha256:be9ccc3a11c3ebcf9701ce573df96a8140dd7d4d41be5d747bde72729ea3fe78	kubevirt/virt-operator:v1.9.1
+virthandler	v1.9.1-CE-centos9-r2	sha256:1fe4c6662d21fba80d7790c86b73afbc3030f4aa9192848c321395853bed082b	kubevirt/virt-handler:v1.9.1
+virtlauncher	v1.9.1-CE-centos9-r2	sha256:82b0f82d8ee0f235b6ad7e1c695ea8f15ce64f8385363c824b31697af6111433	kubevirt/virt-launcher:v1.9.1
+virtexportproxy	v1.9.1-CE-debian12-r2	sha256:0a8159ff7b2d56c76cdf5645a26c1864fc4bff123b2349adf89e90fa7a60ca6e	kubevirt/virt-exportproxy:v1.9.1
+virtapi	v1.9.1-CE-debian12-r2	sha256:38ee20d8459ac3344e048c09fb4295a29ad9615f08037dfb8a2e651cee253ae2	kubevirt/virt-api:v1.9.1
+virtcontroller	v1.9.1-CE-debian12-r2	sha256:d19615aad99d9715a0cf91e41647795dac2d49ee7c2b6acc83d2fbed1c1212c5	kubevirt/virt-controller:v1.9.1

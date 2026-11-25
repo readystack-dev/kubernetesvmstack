@@ -1,0 +1,2366 @@
+{
+  "schema": "kitforge.stack_runbook_evidence.v1",
+  "stack": "kubevirt-on-kubeadm",
+  "product": "kubernetesvmstack",
+  "started_at": "2026-10-29T02:34:55Z",
+  "finished_at": "2026-10-29T13:44:31Z",
+  "control_host": "<redacted: internal host>",
+  "nodes": [
+    "kvs-cp1",
+    "kvs-cp2",
+    "kvs-cp3"
+  ],
+  "source": {
+    "path": "product-kits/kubevirt-stack/runbook/RUNBOOK.src.md",
+    "sha256": "12e19a2a87f7a4e844bfa4b8abc43d48abcc7bca455fd66a9175555314b95e34"
+  },
+  "facts_file": {
+    "path": "product-kits/kubevirt-stack/runbook/facts.json",
+    "sha256": "a23b982b8191ca67caed4b8d332cecd40ec1a4751ebf42c7eb09b79dce1b8403"
+  },
+  "manifest": {
+    "path": "registry/stacks/kubevirt-stack.json",
+    "sha256": "82136f8160036d549b6a705b74f4acfff627c1beacc1e986b7c623104eeb031e"
+  },
+  "repo_commit": "ce6f03fc5ce363a51820e5b3e753cecc4dcc6dd0",
+  "allowed_groups": [
+    "read",
+    "write",
+    "disruptive",
+    "destructive"
+  ],
+  "facts": {
+    "containerd_version": {
+      "value": "2.3.7",
+      "ok": true,
+      "rc": 0,
+      "where": "admin",
+      "cmd": "kubectl get nodes -o jsonpath='{.items[0].status.nodeInfo.containerRuntimeVersion}'",
+      "output": "containerd://2.3.7"
+    },
+    "control_plane_endpoint": {
+      "value": "10.77.0.10:6443",
+      "ok": true,
+      "rc": 0,
+      "where": "admin",
+      "cmd": "kubectl -n kube-system get cm kubeadm-config -o jsonpath='{.data.ClusterConfiguration}'",
+      "output": "apiServer:\n  certSANs:\n  - 10.77.0.10\napiVersion: kubeadm.k8s.io/v1beta4\ncaCertificateValidityPeriod: 87600h0m0s\ncertificateValidityPeriod: 8760h0m0s\ncertificatesDir: /etc/kubernetes/pki\nclusterName: kubernetes\ncontrolPlaneEndpoint: 10.77.0.10:6443\ncontrollerManager: {}\ndns: {}\nencryptionAlgorithm: RSA-2048\netcd:\n  local:\n    dataDir: /var/lib/etcd\n    imageTag: v3.7.3\nimageRepository: 10.77.0.1:5000\nkind: ClusterConfiguration\nkubernetesVersion: v1.36.6\nnetworking:\n  dnsDomain: cluster.local\n  podSubnet: 10.244.0.0/16\n  serviceSubnet: 10.96.0.0/12\nproxy:\n  disabled: true\nscheduler: {}"
+    },
+    "coredns_image": {
+      "value": "10.77.0.1:5000/coredns:v1.14.2",
+      "ok": true,
+      "rc": 0,
+      "where": "admin",
+      "cmd": "kubectl -n kube-system get deploy coredns -o jsonpath='{.spec.template.spec.containers[0].image}'",
+      "output": "10.77.0.1:5000/coredns:v1.14.2"
+    },
+    "etcd_version": {
+      "value": "3.7.3",
+      "ok": true,
+      "rc": 0,
+      "where": "kvs-cp1",
+      "cmd": "sudo crictl exec \"$(sudo crictl ps -q --name '^etcd$' | head -n 1)\" etcd --version",
+      "output": "etcd Version: 3.7.3\nGit SHA: 0a173d0\nGo Version: go1.26.10\nGo OS/Arch: linux/amd64"
+    },
+    "flannel_backend": {
+      "value": "vxlan",
+      "ok": true,
+      "rc": 0,
+      "where": "admin",
+      "cmd": "kubectl -n kube-flannel get cm kube-flannel-cfg -o jsonpath='{.data.net-conf\\.json}'",
+      "output": "{\n  \"Network\": \"10.244.0.0/16\",\n  \"EnableNFTables\": false,\n  \"Backend\": {\n    \"Type\": \"vxlan\"\n  }\n}"
+    },
+    "flannel_network": {
+      "value": "10.244.0.0/16",
+      "ok": true,
+      "rc": 0,
+      "where": "admin",
+      "cmd": "kubectl -n kube-flannel get cm kube-flannel-cfg -o jsonpath='{.data.net-conf\\.json}'",
+      "output": "{\n  \"Network\": \"10.244.0.0/16\",\n  \"EnableNFTables\": false,\n  \"Backend\": {\n    \"Type\": \"vxlan\"\n  }\n}"
+    },
+    "image_repository": {
+      "value": "10.77.0.1:5000",
+      "ok": true,
+      "rc": 0,
+      "where": "admin",
+      "cmd": "kubectl -n kube-system get cm kubeadm-config -o jsonpath='{.data.ClusterConfiguration}'",
+      "output": "apiServer:\n  certSANs:\n  - 10.77.0.10\napiVersion: kubeadm.k8s.io/v1beta4\ncaCertificateValidityPeriod: 87600h0m0s\ncertificateValidityPeriod: 8760h0m0s\ncertificatesDir: /etc/kubernetes/pki\nclusterName: kubernetes\ncontrolPlaneEndpoint: 10.77.0.10:6443\ncontrollerManager: {}\ndns: {}\nencryptionAlgorithm: RSA-2048\netcd:\n  local:\n    dataDir: /var/lib/etcd\n    imageTag: v3.7.3\nimageRepository: 10.77.0.1:5000\nkind: ClusterConfiguration\nkubernetesVersion: v1.36.6\nnetworking:\n  dnsDomain: cluster.local\n  podSubnet: 10.244.0.0/16\n  serviceSubnet: 10.96.0.0/12\nproxy:\n  disabled: true\nscheduler: {}"
+    },
+    "kernel_version": {
+      "value": "6.8.0-147-generic",
+      "ok": true,
+      "rc": 0,
+      "where": "admin",
+      "cmd": "kubectl get nodes -o jsonpath='{.items[0].status.nodeInfo.kernelVersion}'",
+      "output": "6.8.0-147-generic"
+    },
+    "kubernetes_version": {
+      "value": "v1.36.6",
+      "ok": true,
+      "rc": 0,
+      "where": "admin",
+      "cmd": "kubectl version -o json",
+      "output": "{\n  \"clientVersion\": {\n    \"major\": \"1\",\n    \"minor\": \"36\",\n    \"gitVersion\": \"v1.36.6\",\n    \"gitCommit\": \"1b2171b110bb2a2542e1322035c6583ec86eb976\",\n    \"gitTreeState\": \"clean\",\n    \"buildDate\": \"2026-10-27T12:02:52Z\",\n    \"goVersion\": \"go1.26.10\",\n    \"compiler\": \"gc\",\n    \"platform\": \"linux/amd64\"\n  },\n  \"kustomizeVersion\": \"v5.8.1\",\n  \"serverVersion\": {\n    \"major\": \"1\",\n    \"minor\": \"36\",\n    \"emulationMajor\": \"1\",\n    \"emulationMinor\": \"36\",\n    \"minCompatibilityMajor\": \"1\",\n    \"minCompatibilityMinor\": \"35\",\n    \"gitVersion\": \"v1.36.6\",\n    \"gitCommit\": \"1b2171b110bb2a2542e1322035c6583ec86eb976\",\n    \"gitTreeState\": \"clean\",\n    \"buildDate\": \"2026-10-27T12:02:52Z\",\n    \"goVersion\": \"go1.26.10\",\n    \"compiler\": \"gc\",\n    \"platform\": \"linux/amd64\"\n  }\n}"
+    },
+    "kubevirt_phase": {
+      "value": "Deployed",
+      "ok": true,
+      "rc": 0,
+      "where": "admin",
+      "cmd": "kubectl -n kubevirt get kv kubevirt -o jsonpath='{.status.phase}'",
+      "output": "Deployed"
+    },
+    "kubevirt_version": {
+      "value": "v1.9.1",
+      "ok": true,
+      "rc": 0,
+      "where": "admin",
+      "cmd": "kubectl -n kubevirt get kv kubevirt -o jsonpath='{.status.observedKubeVirtVersion}'",
+      "output": "v1.9.1"
+    },
+    "node_count": {
+      "value": "3",
+      "ok": true,
+      "rc": 0,
+      "where": "admin",
+      "cmd": "kubectl get nodes --no-headers | wc -l",
+      "output": "3"
+    },
+    "os_image": {
+      "value": "Ubuntu 24.04.5 LTS",
+      "ok": true,
+      "rc": 0,
+      "where": "admin",
+      "cmd": "kubectl get nodes -o jsonpath='{.items[0].status.nodeInfo.osImage}'",
+      "output": "Ubuntu 24.04.5 LTS"
+    },
+    "pause_image": {
+      "value": "10.77.0.1:5000/pause:3.10.2",
+      "ok": true,
+      "rc": 0,
+      "where": "kvs-cp1",
+      "cmd": "sudo grep -E '^\\s*sandbox\\s*=' /etc/containerd/config.toml",
+      "output": "    sandbox = '10.77.0.1:5000/pause:3.10.2'"
+    },
+    "pod_subnet": {
+      "value": "10.244.0.0/16",
+      "ok": true,
+      "rc": 0,
+      "where": "admin",
+      "cmd": "kubectl -n kube-system get cm kubeadm-config -o jsonpath='{.data.ClusterConfiguration}'",
+      "output": "apiServer:\n  certSANs:\n  - 10.77.0.10\napiVersion: kubeadm.k8s.io/v1beta4\ncaCertificateValidityPeriod: 87600h0m0s\ncertificateValidityPeriod: 8760h0m0s\ncertificatesDir: /etc/kubernetes/pki\nclusterName: kubernetes\ncontrolPlaneEndpoint: 10.77.0.10:6443\ncontrollerManager: {}\ndns: {}\nencryptionAlgorithm: RSA-2048\netcd:\n  local:\n    dataDir: /var/lib/etcd\n    imageTag: v3.7.3\nimageRepository: 10.77.0.1:5000\nkind: ClusterConfiguration\nkubernetesVersion: v1.36.6\nnetworking:\n  dnsDomain: cluster.local\n  podSubnet: 10.244.0.0/16\n  serviceSubnet: 10.96.0.0/12\nproxy:\n  disabled: true\nscheduler: {}"
+    },
+    "service_subnet": {
+      "value": "10.96.0.0/12",
+      "ok": true,
+      "rc": 0,
+      "where": "admin",
+      "cmd": "kubectl -n kube-system get cm kubeadm-config -o jsonpath='{.data.ClusterConfiguration}'",
+      "output": "apiServer:\n  certSANs:\n  - 10.77.0.10\napiVersion: kubeadm.k8s.io/v1beta4\ncaCertificateValidityPeriod: 87600h0m0s\ncertificateValidityPeriod: 8760h0m0s\ncertificatesDir: /etc/kubernetes/pki\nclusterName: kubernetes\ncontrolPlaneEndpoint: 10.77.0.10:6443\ncontrollerManager: {}\ndns: {}\nencryptionAlgorithm: RSA-2048\netcd:\n  local:\n    dataDir: /var/lib/etcd\n    imageTag: v3.7.3\nimageRepository: 10.77.0.1:5000\nkind: ClusterConfiguration\nkubernetesVersion: v1.36.6\nnetworking:\n  dnsDomain: cluster.local\n  podSubnet: 10.244.0.0/16\n  serviceSubnet: 10.96.0.0/12\nproxy:\n  disabled: true\nscheduler: {}"
+    },
+    "vip_holder": {
+      "value": "kvs-cp2",
+      "ok": true,
+      "rc": 0,
+      "where": "admin",
+      "cmd": "kubectl -n kube-system get lease plndr-cp-lock -o jsonpath='{.spec.holderIdentity}'",
+      "output": "kvs-cp2"
+    },
+    "virtctl_version": {
+      "value": "v1.9.1",
+      "ok": true,
+      "rc": 0,
+      "where": "admin",
+      "cmd": "virtctl version --client",
+      "output": "Client Version: version.Info{GitVersion:\"v1.9.1\", GitCommit:\"c3d19093f9c7b843b3879b18dc088911c081c39e\", GitTreeState:\"clean\", BuildDate:\"2026-10-09T05:21:13Z\", GoVersion:\"go1.26.10\", Compiler:\"gc\", Platform:\"linux/amd64\"}"
+    }
+  },
+  "checks": {
+    "admin-access": {
+      "section": "how-to-read",
+      "target": {
+        "on": "admin"
+      },
+      "cmd": "kubectl get --raw=/readyz; echo\nkubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}{\"\\n\"}'",
+      "group": "read",
+      "expect": "^ok$",
+      "components": [],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "admin",
+          "rc": 0,
+          "output": "ok\nhttps://10.77.0.10:6443",
+          "seconds": 0.9
+        }
+      ],
+      "ran_at": "2026-10-29T02:35:13Z"
+    },
+    "images-in-use": {
+      "section": "what-it-installs",
+      "target": {
+        "on": "admin"
+      },
+      "cmd": "kubectl get pods -A -o jsonpath='{range .items[*]}{range .spec.initContainers[*]}{.image}{\"\\n\"}{end}{range .spec.containers[*]}{.image}{\"\\n\"}{end}{end}' | sort -u",
+      "group": "read",
+      "expect": "/",
+      "components": [
+        "kubeapiserver",
+        "kubecontrollermanager",
+        "kubescheduler",
+        "kubeproxy",
+        "kubevip",
+        "flannel",
+        "flannelcniplugin",
+        "multuscni",
+        "virtoperator",
+        "virtapi",
+        "virtcontroller",
+        "virthandler",
+        "virtexportproxy",
+        "virtlauncher"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "admin",
+          "rc": 0,
+          "output": "10.77.0.1:5000/coredns:v1.14.2\n10.77.0.1:5000/etcd:v3.7.3\n10.77.0.1:5000/kube-apiserver:v1.36.6\n10.77.0.1:5000/kube-controller-manager:v1.36.6\n10.77.0.1:5000/kube-proxy:v1.36.6@sha256:690fd8d24cd4ffbf70dbe1ba26ac48ce80a972d7183cf691948ff5ff8ca8d56c\n10.77.0.1:5000/kube-scheduler:v1.36.6\n10.77.0.1:5000/kubevirt/virt-api@sha256:3b9821f4de2decd949a4e7fba4bdf724226c652544384195ac534b9daf03947a\n10.77.0.1:5000/kubevirt/virt-controller@sha256:e3b93539f7842851fb18c45508542f5c842280e30a9f9a35aee15ad8a43ac6af\n10.77.0.1:5000/kubevirt/virt-exportproxy@sha256:08ae58dc5e2f7d70df82e138252444bb59bd1929758ba6a293c72e564efd6649\n10.77.0.1:5000/kubevirt/virt-handler@sha256:6136df8f03ae550fa9b376e0ca210f14be9f2b876c0cd90e44fec40965bff824\n10.77.0.1:5000/kubevirt/virt-launcher@sha256:ae22cd3068d148beaef04c912cecab732bedac61a7ac538f6fbee8cb1d884904\n10.77.0.1:5000/kubevirt/virt-operator@sha256:7e27c9489846f1328ecba4006654c2938a4596ea1c7a6e0cef45287f4abfa078\n10.77.0.1:5000/readystack/flannel@sha256:97cef957da7a851cdb96fbd19da105a6870ddfc111e450b16537cea83f3b1db5\n10.77.0.1:5000/readystack/flannelcniplugin@sha256:4511acd7413d1e6fd78d3d712921d794cb820a3b62973512532d7b64f2cc4e8a\n10.77.0.1:5000/readystack/kubeapiserver@sha256:49c4d7708668d7ab42ae0d1d3d584063f67ef87f2d746e21d6709288afdb997e\n10.77.0.1:5000/readystack/kubevip@sha256:74dd28c7b8af69cd7cf4684338b782d1fbf939a1dbfabeb1545d70b077cf934b\n10.77.0.1:5000/readystack/multuscni@sha256:f90014221243e98cf21d56dc66e3f53bf386c1c1484a633e550dadf4e39f324e",
+          "seconds": 1.1
+        }
+      ],
+      "ran_at": "2026-10-29T02:35:14Z"
+    },
+    "image-users": {
+      "section": "what-it-installs",
+      "target": {
+        "on": "node",
+        "node": "each"
+      },
+      "cmd": "out=$(for i in $(sudo crictl images -q); do sudo crictl inspecti -o json \"$i\" | python3 -c 'import json, sys; d = json.load(sys.stdin); print(d[\"status\"][\"repoDigests\"][0], \" user=\" + (d[\"info\"][\"imageSpec\"][\"config\"].get(\"User\") or \"(none: root)\"))'; done | sort)\necho \"$out\"\n! echo \"$out\" | grep -qE 'user=(0|0:0|root|\\(none: root\\))$'",
+      "group": "read",
+      "expect": "user=",
+      "components": [
+        "kubeapiserver",
+        "kubecontrollermanager",
+        "kubescheduler",
+        "kubeproxy",
+        "kubevip",
+        "flannel",
+        "flannelcniplugin",
+        "multuscni",
+        "virtoperator",
+        "virtapi",
+        "virtcontroller",
+        "virthandler",
+        "virtexportproxy",
+        "virtlauncher",
+        "pause"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "kvs-cp1",
+          "rc": 0,
+          "output": "10.77.0.1:5000/coredns@sha256:faf5d9691f306d7f318377a2db731aa843ef8ed23866e7c410cdbc001dda2c4b  user=65532:65532\n10.77.0.1:5000/etcd@sha256:b86345e29e39a9d41a26af8d79b9e784c26fb9c6b4614340e6ce663f12fe8f1b  user=etcd\n10.77.0.1:5000/kube-apiserver@sha256:49c4d7708668d7ab42ae0d1d3d584063f67ef87f2d746e21d6709288afdb997e  user=999:999\n10.77.0.1:5000/kube-controller-manager@sha256:f832d6d6174e904cb86f178379571f02421cd5e056f112da12062aec8d2f93a2  user=999:999\n10.77.0.1:5000/kube-proxy@sha256:690fd8d24cd4ffbf70dbe1ba26ac48ce80a972d7183cf691948ff5ff8ca8d56c  user=999:999\n10.77.0.1:5000/kube-scheduler@sha256:db92258d58a8e98424edd20418624e6625c4360acedd4dd919443a3e538c9ef8  user=999:999\n10.77.0.1:5000/kubevirt/virt-api@sha256:3b9821f4de2decd949a4e7fba4bdf724226c652544384195ac534b9daf03947a  user=1001\n10.77.0.1:5000/kubevirt/virt-controller@sha256:e3b93539f7842851fb18c45508542f5c842280e30a9f9a35aee15ad8a43ac6af  user=1001\n10.77.0.1:5000/kubevirt/virt-handler@sha256:6136df8f03ae550fa9b376e0ca210f14be9f2b876c0cd90e44fec40965bff824  user=107\n10.77.0.1:5000/kubevirt/virt-launcher@sha256:ae22cd3068d148beaef04c912cecab732bedac61a7ac538f6fbee8cb1d884904  user=107\n10.77.0.1:5000/kubevirt/virt-operator@sha256:7e27c9489846f1328ecba4006654c2938a4596ea1c7a6e0cef45287f4abfa078  user=1001\n10.77.0.1:5000/pause@sha256:3f755e85d22288dbb1ae6595ea088b6f1a9271a4185fe9d5edae7fbb9f599b3e  user=65535:65535\n10.77.0.1:5000/readystack/flannel@sha256:97cef957da7a851cdb96fbd19da105a6870ddfc111e450b16537cea83f3b1db5  user=flannel\n10.77.0.1:5000/readystack/flannelcniplugin@sha256:4511acd7413d1e6fd78d3d712921d794cb820a3b62973512532d7b64f2cc4e8a  user=flannelcniplugin\n10.77.0.1:5000/readystack/kubevip@sha256:74dd28c7b8af69cd7cf4684338b782d1fbf939a1dbfabeb1545d70b077cf934b  user=kubevip\n10.77.0.1:5000/readystack/multuscni@sha256:f90014221243e98cf21d56dc66e3f53bf386c1c1484a633e550dadf4e39f324e  user=multuscni",
+          "seconds": 3.2
+        },
+        {
+          "where": "kvs-cp2",
+          "rc": 0,
+          "output": "10.77.0.1:5000/coredns@sha256:faf5d9691f306d7f318377a2db731aa843ef8ed23866e7c410cdbc001dda2c4b  user=65532:65532\n10.77.0.1:5000/etcd@sha256:b86345e29e39a9d41a26af8d79b9e784c26fb9c6b4614340e6ce663f12fe8f1b  user=etcd\n10.77.0.1:5000/kube-apiserver@sha256:49c4d7708668d7ab42ae0d1d3d584063f67ef87f2d746e21d6709288afdb997e  user=999:999\n10.77.0.1:5000/kube-controller-manager@sha256:f832d6d6174e904cb86f178379571f02421cd5e056f112da12062aec8d2f93a2  user=999:999\n10.77.0.1:5000/kube-proxy@sha256:690fd8d24cd4ffbf70dbe1ba26ac48ce80a972d7183cf691948ff5ff8ca8d56c  user=999:999\n10.77.0.1:5000/kube-scheduler@sha256:db92258d58a8e98424edd20418624e6625c4360acedd4dd919443a3e538c9ef8  user=999:999\n10.77.0.1:5000/kubevirt/virt-controller@sha256:e3b93539f7842851fb18c45508542f5c842280e30a9f9a35aee15ad8a43ac6af  user=1001\n10.77.0.1:5000/kubevirt/virt-exportproxy@sha256:08ae58dc5e2f7d70df82e138252444bb59bd1929758ba6a293c72e564efd6649  user=1001\n10.77.0.1:5000/kubevirt/virt-handler@sha256:6136df8f03ae550fa9b376e0ca210f14be9f2b876c0cd90e44fec40965bff824  user=107\n10.77.0.1:5000/kubevirt/virt-launcher@sha256:ae22cd3068d148beaef04c912cecab732bedac61a7ac538f6fbee8cb1d884904  user=107\n10.77.0.1:5000/pause@sha256:3f755e85d22288dbb1ae6595ea088b6f1a9271a4185fe9d5edae7fbb9f599b3e  user=65535:65535\n10.77.0.1:5000/readystack/flannel@sha256:97cef957da7a851cdb96fbd19da105a6870ddfc111e450b16537cea83f3b1db5  user=flannel\n10.77.0.1:5000/readystack/flannelcniplugin@sha256:4511acd7413d1e6fd78d3d712921d794cb820a3b62973512532d7b64f2cc4e8a  user=flannelcniplugin\n10.77.0.1:5000/readystack/kubevip@sha256:74dd28c7b8af69cd7cf4684338b782d1fbf939a1dbfabeb1545d70b077cf934b  user=kubevip\n10.77.0.1:5000/readystack/multuscni@sha256:f90014221243e98cf21d56dc66e3f53bf386c1c1484a633e550dadf4e39f324e  user=multuscni",
+          "seconds": 4.3
+        },
+        {
+          "where": "kvs-cp3",
+          "rc": 0,
+          "output": "10.77.0.1:5000/coredns@sha256:faf5d9691f306d7f318377a2db731aa843ef8ed23866e7c410cdbc001dda2c4b  user=65532:65532\n10.77.0.1:5000/etcd@sha256:b86345e29e39a9d41a26af8d79b9e784c26fb9c6b4614340e6ce663f12fe8f1b  user=etcd\n10.77.0.1:5000/kube-apiserver@sha256:49c4d7708668d7ab42ae0d1d3d584063f67ef87f2d746e21d6709288afdb997e  user=999:999\n10.77.0.1:5000/kube-controller-manager@sha256:f832d6d6174e904cb86f178379571f02421cd5e056f112da12062aec8d2f93a2  user=999:999\n10.77.0.1:5000/kube-proxy@sha256:690fd8d24cd4ffbf70dbe1ba26ac48ce80a972d7183cf691948ff5ff8ca8d56c  user=999:999\n10.77.0.1:5000/kube-scheduler@sha256:db92258d58a8e98424edd20418624e6625c4360acedd4dd919443a3e538c9ef8  user=999:999\n10.77.0.1:5000/kubevirt/virt-api@sha256:3b9821f4de2decd949a4e7fba4bdf724226c652544384195ac534b9daf03947a  user=1001\n10.77.0.1:5000/kubevirt/virt-handler@sha256:6136df8f03ae550fa9b376e0ca210f14be9f2b876c0cd90e44fec40965bff824  user=107\n10.77.0.1:5000/kubevirt/virt-launcher@sha256:ae22cd3068d148beaef04c912cecab732bedac61a7ac538f6fbee8cb1d884904  user=107\n10.77.0.1:5000/kubevirt/virt-operator@sha256:7e27c9489846f1328ecba4006654c2938a4596ea1c7a6e0cef45287f4abfa078  user=1001\n10.77.0.1:5000/pause@sha256:3f755e85d22288dbb1ae6595ea088b6f1a9271a4185fe9d5edae7fbb9f599b3e  user=65535:65535\n10.77.0.1:5000/readystack/flannel@sha256:97cef957da7a851cdb96fbd19da105a6870ddfc111e450b16537cea83f3b1db5  user=flannel\n10.77.0.1:5000/readystack/flannelcniplugin@sha256:4511acd7413d1e6fd78d3d712921d794cb820a3b62973512532d7b64f2cc4e8a  user=flannelcniplugin\n10.77.0.1:5000/readystack/kubevip@sha256:74dd28c7b8af69cd7cf4684338b782d1fbf939a1dbfabeb1545d70b077cf934b  user=kubevip\n10.77.0.1:5000/readystack/multuscni@sha256:f90014221243e98cf21d56dc66e3f53bf386c1c1484a633e550dadf4e39f324e  user=multuscni",
+          "seconds": 4.1
+        }
+      ],
+      "ran_at": "2026-10-29T02:35:15Z"
+    },
+    "registry-config-mode": {
+      "section": "registry",
+      "target": {
+        "on": "node",
+        "node": "each"
+      },
+      "cmd": "sudo stat -c '%a %U:%G %n' /root/registry.env /etc/containerd/config.toml",
+      "group": "read",
+      "expect": "^600 root:root /etc/containerd/config.toml$",
+      "components": [
+        "kubernetesnode"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "kvs-cp1",
+          "rc": 0,
+          "output": "600 root:root /root/registry.env\n600 root:root /etc/containerd/config.toml",
+          "seconds": 1.9
+        },
+        {
+          "where": "kvs-cp2",
+          "rc": 0,
+          "output": "600 root:root /root/registry.env\n600 root:root /etc/containerd/config.toml",
+          "seconds": 1.4
+        },
+        {
+          "where": "kvs-cp3",
+          "rc": 0,
+          "output": "600 root:root /root/registry.env\n600 root:root /etc/containerd/config.toml",
+          "seconds": 1.5
+        }
+      ],
+      "ran_at": "2026-10-29T02:35:27Z"
+    },
+    "pull-redirect": {
+      "section": "registry",
+      "target": {
+        "on": "node",
+        "node": "each"
+      },
+      "cmd": "sudo grep -H '^server' /etc/containerd/certs.d/*/hosts.toml",
+      "group": "read",
+      "expect": "server = 'https://",
+      "components": [
+        "kubernetesnode"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "kvs-cp1",
+          "rc": 0,
+          "output": "/etc/containerd/certs.d/10.77.0.1:5000/hosts.toml:server = 'https://10.77.0.1:5000'\n/etc/containerd/certs.d/docker.io/hosts.toml:server = 'https://10.77.0.1:5000'\n/etc/containerd/certs.d/quay.io/hosts.toml:server = 'https://10.77.0.1:5000'\n/etc/containerd/certs.d/registry.k8s.io/hosts.toml:server = 'https://10.77.0.1:5000'",
+          "seconds": 1.3
+        },
+        {
+          "where": "kvs-cp2",
+          "rc": 0,
+          "output": "/etc/containerd/certs.d/10.77.0.1:5000/hosts.toml:server = 'https://10.77.0.1:5000'\n/etc/containerd/certs.d/docker.io/hosts.toml:server = 'https://10.77.0.1:5000'\n/etc/containerd/certs.d/quay.io/hosts.toml:server = 'https://10.77.0.1:5000'\n/etc/containerd/certs.d/registry.k8s.io/hosts.toml:server = 'https://10.77.0.1:5000'",
+          "seconds": 1.3
+        },
+        {
+          "where": "kvs-cp3",
+          "rc": 0,
+          "output": "/etc/containerd/certs.d/10.77.0.1:5000/hosts.toml:server = 'https://10.77.0.1:5000'\n/etc/containerd/certs.d/docker.io/hosts.toml:server = 'https://10.77.0.1:5000'\n/etc/containerd/certs.d/quay.io/hosts.toml:server = 'https://10.77.0.1:5000'\n/etc/containerd/certs.d/registry.k8s.io/hosts.toml:server = 'https://10.77.0.1:5000'",
+          "seconds": 1.4
+        }
+      ],
+      "ran_at": "2026-10-29T02:35:32Z"
+    },
+    "images-from-registry": {
+      "section": "registry",
+      "target": {
+        "on": "admin"
+      },
+      "cmd": "REG=$(kubectl -n kube-system get cm kubeadm-config -o jsonpath='{.data.ClusterConfiguration}' | awk '$1 == \"imageRepository:\" {print $2}')\necho \"registry: $REG\"\nnames=$(kubectl get nodes -o jsonpath='{range .items[*].status.images[*]}{.names[*]}{\"\\n\"}{end}' | tr ' ' '\\n' | grep . | sort -u)\necho \"$names\" | sed 's/@sha256:.*//; s/:[^:/]*$//' | sort -u\nother=$(echo \"$names\" | grep -v \"^$REG/\" || true)\n[ -z \"$other\" ] || { echo \"not from $REG:\"; echo \"$other\"; exit 1; }",
+      "group": "read",
+      "expect": "^registry: ",
+      "components": [
+        "kubernetesnode",
+        "kubeapiserver",
+        "kubecontrollermanager",
+        "kubescheduler",
+        "kubeproxy",
+        "kubevip",
+        "flannel",
+        "flannelcniplugin",
+        "multuscni",
+        "virtoperator",
+        "virtapi",
+        "virtcontroller",
+        "virthandler",
+        "virtexportproxy",
+        "virtlauncher",
+        "pause"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "admin",
+          "rc": 0,
+          "output": "registry: 10.77.0.1:5000\n10.77.0.1:5000/coredns\n10.77.0.1:5000/etcd\n10.77.0.1:5000/kube-apiserver\n10.77.0.1:5000/kube-controller-manager\n10.77.0.1:5000/kube-proxy\n10.77.0.1:5000/kube-scheduler\n10.77.0.1:5000/kubevirt/virt-api\n10.77.0.1:5000/kubevirt/virt-controller\n10.77.0.1:5000/kubevirt/virt-exportproxy\n10.77.0.1:5000/kubevirt/virt-handler\n10.77.0.1:5000/kubevirt/virt-launcher\n10.77.0.1:5000/kubevirt/virt-operator\n10.77.0.1:5000/pause\n10.77.0.1:5000/readystack/flannel\n10.77.0.1:5000/readystack/flannelcniplugin\n10.77.0.1:5000/readystack/kubeapiserver\n10.77.0.1:5000/readystack/kubevip\n10.77.0.1:5000/readystack/multuscni",
+          "seconds": 1.1
+        }
+      ],
+      "ran_at": "2026-10-29T02:35:36Z"
+    },
+    "node-host": {
+      "section": "nodes",
+      "target": {
+        "on": "node",
+        "node": "each"
+      },
+      "cmd": "uname -m\n. /etc/os-release && echo \"$PRETTY_NAME\"\necho \"swap devices: $(swapon --noheadings | wc -l)\"\ntest -c /dev/kvm && echo \"/dev/kvm: present\"",
+      "group": "read",
+      "expect": "/dev/kvm: present",
+      "components": [
+        "kubernetesnode",
+        "virthandler",
+        "virtlauncher"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "kvs-cp1",
+          "rc": 0,
+          "output": "x86_64\nUbuntu 24.04.5 LTS\nswap devices: 0\n/dev/kvm: present",
+          "seconds": 1.3
+        },
+        {
+          "where": "kvs-cp2",
+          "rc": 0,
+          "output": "x86_64\nUbuntu 24.04.5 LTS\nswap devices: 0\n/dev/kvm: present",
+          "seconds": 1.4
+        },
+        {
+          "where": "kvs-cp3",
+          "rc": 0,
+          "output": "x86_64\nUbuntu 24.04.5 LTS\nswap devices: 0\n/dev/kvm: present",
+          "seconds": 1.3
+        }
+      ],
+      "ran_at": "2026-10-29T02:35:37Z"
+    },
+    "node-versions": {
+      "section": "nodes",
+      "target": {
+        "on": "node",
+        "node": "each"
+      },
+      "cmd": "kubelet --version\nkubeadm version -o short\ncontainerd --version\nrunc --version | head -n 1\ncrictl --version",
+      "group": "read",
+      "expect": "Kubernetes v",
+      "components": [
+        "kubernetesnode"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "kvs-cp1",
+          "rc": 0,
+          "output": "Kubernetes v1.36.6\nv1.36.6\ncontainerd github.com/containerd/containerd/v2 v2.3.7 6f589cf13dc01a5b493911355427e05b2ff005d7\nrunc version 1.5.2\ncrictl version v1.36.0",
+          "seconds": 1.6
+        },
+        {
+          "where": "kvs-cp2",
+          "rc": 0,
+          "output": "Kubernetes v1.36.6\nv1.36.6\ncontainerd github.com/containerd/containerd/v2 v2.3.7 6f589cf13dc01a5b493911355427e05b2ff005d7\nrunc version 1.5.2\ncrictl version v1.36.0",
+          "seconds": 1.6
+        },
+        {
+          "where": "kvs-cp3",
+          "rc": 0,
+          "output": "Kubernetes v1.36.6\nv1.36.6\ncontainerd github.com/containerd/containerd/v2 v2.3.7 6f589cf13dc01a5b493911355427e05b2ff005d7\nrunc version 1.5.2\ncrictl version v1.36.0",
+          "seconds": 1.7
+        }
+      ],
+      "ran_at": "2026-10-29T02:35:41Z"
+    },
+    "node-services": {
+      "section": "nodes",
+      "target": {
+        "on": "node",
+        "node": "each"
+      },
+      "cmd": "systemctl is-active containerd kubelet",
+      "group": "read",
+      "expect": "^active$",
+      "components": [
+        "kubernetesnode"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "kvs-cp1",
+          "rc": 0,
+          "output": "active\nactive",
+          "seconds": 1.3
+        },
+        {
+          "where": "kvs-cp2",
+          "rc": 0,
+          "output": "active\nactive",
+          "seconds": 1.3
+        },
+        {
+          "where": "kvs-cp3",
+          "rc": 0,
+          "output": "active\nactive",
+          "seconds": 1.4
+        }
+      ],
+      "ran_at": "2026-10-29T02:35:46Z"
+    },
+    "sandbox-image": {
+      "section": "nodes",
+      "target": {
+        "on": "node",
+        "node": "each"
+      },
+      "cmd": "sudo grep -E '^\\s*sandbox\\s*=' /etc/containerd/config.toml",
+      "group": "read",
+      "expect": "sandbox = ",
+      "components": [
+        "pause",
+        "kubernetesnode"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "kvs-cp1",
+          "rc": 0,
+          "output": "    sandbox = '10.77.0.1:5000/pause:3.10.2'",
+          "seconds": 1.3
+        },
+        {
+          "where": "kvs-cp2",
+          "rc": 0,
+          "output": "    sandbox = '10.77.0.1:5000/pause:3.10.2'",
+          "seconds": 1.3
+        },
+        {
+          "where": "kvs-cp3",
+          "rc": 0,
+          "output": "    sandbox = '10.77.0.1:5000/pause:3.10.2'",
+          "seconds": 1.4
+        }
+      ],
+      "ran_at": "2026-10-29T02:35:50Z"
+    },
+    "pause-processes": {
+      "section": "nodes",
+      "target": {
+        "on": "node",
+        "node": "any"
+      },
+      "cmd": "ps -eo uid,comm | awk '$2 == \"pause\" {print $1}' | sort -n | uniq -c",
+      "group": "read",
+      "expect": "\\d+ \\d+",
+      "components": [
+        "pause"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "kvs-cp1",
+          "rc": 0,
+          "output": "      4 0\n      9 65535",
+          "seconds": 1.4
+        }
+      ],
+      "ran_at": "2026-10-29T02:35:54Z"
+    },
+    "kube-vip-pods": {
+      "section": "kube-vip",
+      "target": {
+        "on": "admin"
+      },
+      "cmd": "kubectl -n kube-system get pods -o wide | awk 'NR == 1 || /^kube-vip-/'\nkubectl -n kube-system get lease plndr-cp-lock -o jsonpath='{\"lease holder: \"}{.spec.holderIdentity}{\"\\n\"}'",
+      "group": "read",
+      "expect": "kube-vip-",
+      "components": [
+        "kubevip"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "admin",
+          "rc": 0,
+          "output": "NAME                              READY   STATUS    RESTARTS      AGE   IP           NODE      NOMINATED NODE   READINESS GATES\nkube-vip-kvs-cp1                  1/1     Running   1 (64m ago)   71m   10.77.0.11   kvs-cp1   <none>           <none>\nkube-vip-kvs-cp2                  1/1     Running   0             70m   10.77.0.12   kvs-cp2   <none>           <none>\nkube-vip-kvs-cp3                  1/1     Running   0             69m   10.77.0.13   kvs-cp3   <none>           <none>\nlease holder: kvs-cp2",
+          "seconds": 1.1
+        }
+      ],
+      "ran_at": "2026-10-29T02:35:55Z"
+    },
+    "kube-vip-manifest": {
+      "section": "kube-vip",
+      "target": {
+        "on": "node",
+        "node": "each"
+      },
+      "cmd": "sudo grep -A1 -E 'name: (vip_interface|address)$' /etc/kubernetes/manifests/kube-vip.yaml | grep -v '^--'\nsudo grep -E '^\\s+path: /etc/kubernetes/[a-z-]+\\.conf$' /etc/kubernetes/manifests/kube-vip.yaml",
+      "group": "read",
+      "expect": "path: /etc/kubernetes/admin.conf",
+      "components": [
+        "kubevip"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "kvs-cp1",
+          "rc": 0,
+          "output": "    - name: vip_interface\n      value: br0\n    - name: address\n      value: 10.77.0.10\n      path: /etc/kubernetes/admin.conf",
+          "seconds": 1.4
+        },
+        {
+          "where": "kvs-cp2",
+          "rc": 0,
+          "output": "    - name: vip_interface\n      value: br0\n    - name: address\n      value: 10.77.0.10\n      path: /etc/kubernetes/admin.conf",
+          "seconds": 1.3
+        },
+        {
+          "where": "kvs-cp3",
+          "rc": 0,
+          "output": "    - name: vip_interface\n      value: br0\n    - name: address\n      value: 10.77.0.10\n      path: /etc/kubernetes/admin.conf",
+          "seconds": 1.5
+        }
+      ],
+      "ran_at": "2026-10-29T02:35:56Z"
+    },
+    "kube-vip-root": {
+      "section": "kube-vip",
+      "target": {
+        "on": "node",
+        "node": "each"
+      },
+      "cmd": "ps -eo uid,comm | awk '$2 == \"kube-vip\"'",
+      "group": "read",
+      "expect": "^\\s*0 kube-vip$",
+      "components": [
+        "kubevip"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "kvs-cp1",
+          "rc": 0,
+          "output": "    0 kube-vip",
+          "seconds": 2.2
+        },
+        {
+          "where": "kvs-cp2",
+          "rc": 0,
+          "output": "    0 kube-vip",
+          "seconds": 1.3
+        },
+        {
+          "where": "kvs-cp3",
+          "rc": 0,
+          "output": "    0 kube-vip",
+          "seconds": 1.3
+        }
+      ],
+      "ran_at": "2026-10-29T02:36:00Z"
+    },
+    "kubeadm-config": {
+      "section": "kubeadm",
+      "target": {
+        "on": "admin"
+      },
+      "cmd": "kubectl -n kube-system get cm kubeadm-config -o jsonpath='{.data.ClusterConfiguration}'",
+      "group": "read",
+      "expect": "controlPlaneEndpoint:",
+      "components": [
+        "kubeapiserver",
+        "kubecontrollermanager",
+        "kubescheduler"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "admin",
+          "rc": 0,
+          "output": "apiServer:\n  certSANs:\n  - 10.77.0.10\napiVersion: kubeadm.k8s.io/v1beta4\ncaCertificateValidityPeriod: 87600h0m0s\ncertificateValidityPeriod: 8760h0m0s\ncertificatesDir: /etc/kubernetes/pki\nclusterName: kubernetes\ncontrolPlaneEndpoint: 10.77.0.10:6443\ncontrollerManager: {}\ndns: {}\nencryptionAlgorithm: RSA-2048\netcd:\n  local:\n    dataDir: /var/lib/etcd\n    imageTag: v3.7.3\nimageRepository: 10.77.0.1:5000\nkind: ClusterConfiguration\nkubernetesVersion: v1.36.6\nnetworking:\n  dnsDomain: cluster.local\n  podSubnet: 10.244.0.0/16\n  serviceSubnet: 10.96.0.0/12\nproxy:\n  disabled: true\nscheduler: {}",
+          "seconds": 1.0
+        }
+      ],
+      "ran_at": "2026-10-29T02:36:05Z"
+    },
+    "kubeadm-patches": {
+      "section": "kubeadm",
+      "target": {
+        "on": "node",
+        "node": "each"
+      },
+      "cmd": "sudo ls /etc/kubernetes/patches",
+      "group": "read",
+      "expect": "kube-apiserver\\+strategic\\.yaml",
+      "components": [
+        "kubeapiserver",
+        "kubecontrollermanager",
+        "kubescheduler"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "kvs-cp1",
+          "rc": 0,
+          "output": "etcd+strategic.yaml\nkube-apiserver+strategic.yaml\nkube-controller-manager+strategic.yaml\nkube-scheduler+strategic.yaml",
+          "seconds": 1.5
+        },
+        {
+          "where": "kvs-cp2",
+          "rc": 0,
+          "output": "etcd+strategic.yaml\nkube-apiserver+strategic.yaml\nkube-controller-manager+strategic.yaml\nkube-scheduler+strategic.yaml",
+          "seconds": 1.4
+        },
+        {
+          "where": "kvs-cp3",
+          "rc": 0,
+          "output": "etcd+strategic.yaml\nkube-apiserver+strategic.yaml\nkube-controller-manager+strategic.yaml\nkube-scheduler+strategic.yaml",
+          "seconds": 1.5
+        }
+      ],
+      "ran_at": "2026-10-29T02:36:06Z"
+    },
+    "ca-cert-hash": {
+      "section": "kubeadm",
+      "target": {
+        "on": "node",
+        "node": "any"
+      },
+      "cmd": "sudo openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl pkey -pubin -outform der | sha256sum | cut -c1-64",
+      "group": "read",
+      "expect": "^[0-9a-f]{64}$",
+      "components": [
+        "kubeapiserver"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "kvs-cp1",
+          "rc": 0,
+          "output": "edcfcb0d1bafaa3530adf87ab80b4511f46da42fe4790720aa0e60509eb52493",
+          "seconds": 1.4
+        }
+      ],
+      "ran_at": "2026-10-29T02:36:10Z"
+    },
+    "static-pods-root": {
+      "section": "kubeadm",
+      "target": {
+        "on": "node",
+        "node": "each"
+      },
+      "cmd": "ps -eo uid,comm | awk '$2 ~ /^(kube-apiserver|kube-controller|kube-scheduler|etcd)$/'\nc=$(ps -eo uid,comm | awk '$1 == 0 && $2 ~ /^(kube-apiserver|kube-controller|kube-scheduler|etcd)$/' | wc -l)\necho \"$c of 4 control-plane processes as uid 0\"\n[ \"$c\" = 4 ]",
+      "group": "read",
+      "expect": "4 of 4 control-plane processes as uid 0",
+      "components": [
+        "kubeapiserver",
+        "kubecontrollermanager",
+        "kubescheduler"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "kvs-cp1",
+          "rc": 0,
+          "output": "    0 kube-controller\n    0 etcd\n    0 kube-scheduler\n    0 kube-apiserver\n4 of 4 control-plane processes as uid 0",
+          "seconds": 1.3
+        },
+        {
+          "where": "kvs-cp2",
+          "rc": 0,
+          "output": "    0 kube-apiserver\n    0 kube-controller\n    0 kube-scheduler\n    0 etcd\n4 of 4 control-plane processes as uid 0",
+          "seconds": 1.3
+        },
+        {
+          "where": "kvs-cp3",
+          "rc": 0,
+          "output": "    0 kube-controller\n    0 kube-apiserver\n    0 etcd\n    0 kube-scheduler\n4 of 4 control-plane processes as uid 0",
+          "seconds": 1.3
+        }
+      ],
+      "ran_at": "2026-10-29T02:36:12Z"
+    },
+    "static-pod-security": {
+      "section": "kubeadm",
+      "target": {
+        "on": "admin"
+      },
+      "cmd": "for c in kube-apiserver kube-controller-manager kube-scheduler etcd; do\n  kubectl -n kube-system get pods -l component=$c -o jsonpath='{range .items[*]}{.metadata.name}: {.spec.securityContext} {.spec.containers[0].image}{\"\\n\"}{end}'\ndone",
+      "group": "read",
+      "expect": "\"runAsUser\":0",
+      "components": [
+        "kubeapiserver",
+        "kubecontrollermanager",
+        "kubescheduler"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "admin",
+          "rc": 0,
+          "output": "kube-apiserver-kvs-cp1: {\"runAsGroup\":0,\"runAsUser\":0,\"seccompProfile\":{\"type\":\"RuntimeDefault\"}} 10.77.0.1:5000/kube-apiserver:v1.36.6\nkube-apiserver-kvs-cp2: {\"runAsGroup\":0,\"runAsUser\":0,\"seccompProfile\":{\"type\":\"RuntimeDefault\"}} 10.77.0.1:5000/kube-apiserver:v1.36.6\nkube-apiserver-kvs-cp3: {\"runAsGroup\":0,\"runAsUser\":0,\"seccompProfile\":{\"type\":\"RuntimeDefault\"}} 10.77.0.1:5000/kube-apiserver:v1.36.6\nkube-controller-manager-kvs-cp1: {\"runAsGroup\":0,\"runAsUser\":0,\"seccompProfile\":{\"type\":\"RuntimeDefault\"}} 10.77.0.1:5000/kube-controller-manager:v1.36.6\nkube-controller-manager-kvs-cp2: {\"runAsGroup\":0,\"runAsUser\":0,\"seccompProfile\":{\"type\":\"RuntimeDefault\"}} 10.77.0.1:5000/kube-controller-manager:v1.36.6\nkube-controller-manager-kvs-cp3: {\"runAsGroup\":0,\"runAsUser\":0,\"seccompProfile\":{\"type\":\"RuntimeDefault\"}} 10.77.0.1:5000/kube-controller-manager:v1.36.6\nkube-scheduler-kvs-cp1: {\"runAsGroup\":0,\"runAsUser\":0,\"seccompProfile\":{\"type\":\"RuntimeDefault\"}} 10.77.0.1:5000/kube-scheduler:v1.36.6\nkube-scheduler-kvs-cp2: {\"runAsGroup\":0,\"runAsUser\":0,\"seccompProfile\":{\"type\":\"RuntimeDefault\"}} 10.77.0.1:5000/kube-scheduler:v1.36.6\nkube-scheduler-kvs-cp3: {\"runAsGroup\":0,\"runAsUser\":0,\"seccompProfile\":{\"type\":\"RuntimeDefault\"}} 10.77.0.1:5000/kube-scheduler:v1.36.6\netcd-kvs-cp1: {\"runAsGroup\":0,\"runAsUser\":0,\"seccompProfile\":{\"type\":\"RuntimeDefault\"}} 10.77.0.1:5000/etcd:v3.7.3\netcd-kvs-cp2: {\"runAsGroup\":0,\"runAsUser\":0,\"seccompProfile\":{\"type\":\"RuntimeDefault\"}} 10.77.0.1:5000/etcd:v3.7.3\netcd-kvs-cp3: {\"runAsGroup\":0,\"runAsUser\":0,\"seccompProfile\":{\"type\":\"RuntimeDefault\"}} 10.77.0.1:5000/etcd:v3.7.3",
+          "seconds": 1.3
+        }
+      ],
+      "ran_at": "2026-10-29T02:36:16Z"
+    },
+    "nodes": {
+      "section": "kubeadm",
+      "target": {
+        "on": "admin"
+      },
+      "cmd": "kubectl get nodes -o wide\n[ -z \"$(kubectl get nodes -o jsonpath='{.items[*].spec.taints}')\" ] && echo \"no node taints\"",
+      "group": "read",
+      "expect": "Ready",
+      "components": [
+        "kubernetesnode"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "admin",
+          "rc": 0,
+          "output": "NAME      STATUS   ROLES           AGE   VERSION   INTERNAL-IP   EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION              CONTAINER-RUNTIME\nkvs-cp1   Ready    control-plane   72m   v1.36.6   10.77.0.11    <none>        Ubuntu 24.04.5 LTS   6.8.0-147-generic (amd64)   containerd://2.3.7\nkvs-cp2   Ready    control-plane   70m   v1.36.6   10.77.0.12    <none>        Ubuntu 24.04.5 LTS   6.8.0-147-generic (amd64)   containerd://2.3.7\nkvs-cp3   Ready    control-plane   69m   v1.36.6   10.77.0.13    <none>        Ubuntu 24.04.5 LTS   6.8.0-147-generic (amd64)   containerd://2.3.7\nno node taints",
+          "seconds": 1.0
+        }
+      ],
+      "ran_at": "2026-10-29T02:36:17Z"
+    },
+    "upload-certs": {
+      "section": "late-join",
+      "target": {
+        "on": "node",
+        "node": "any"
+      },
+      "cmd": "sudo kubeadm init phase upload-certs --upload-certs --config /root/kubeadm-config.yaml",
+      "group": "write",
+      "expect": "upload-certs",
+      "components": [
+        "kubeapiserver"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "kvs-cp1",
+          "rc": 0,
+          "output": "W1029 02:36:19.485419   22680 initconfiguration.go:363] [config] WARNING: Ignored configuration document with GroupVersionKind kubeadm.k8s.io/v1beta4, Kind=JoinConfiguration\nW1029 02:36:19.486328   22680 initconfiguration.go:363] [config] WARNING: Ignored configuration document with GroupVersionKind kubeadm.k8s.io/v1beta4, Kind=UpgradeConfiguration\n[upload-certs] Storing the certificates in Secret \"kubeadm-certs\" in the \"kube-system\" Namespace\n[upload-certs] Using certificate key:\n<redacted>",
+          "seconds": 1.7
+        }
+      ],
+      "ran_at": "2026-10-29T02:36:18Z"
+    },
+    "kube-proxy": {
+      "section": "pod-network",
+      "target": {
+        "on": "admin"
+      },
+      "cmd": "kubectl -n kube-system rollout status ds/kube-proxy --timeout=60s\nkubectl -n kube-system get ds kube-proxy -o jsonpath='{.spec.template.spec.containers[0].securityContext}{\" \"}{.spec.template.spec.containers[0].image}{\"\\n\"}'\nkubectl -n kube-system get cm kube-proxy -o jsonpath='{.data.config\\.conf}' | grep -E '^mode:'",
+      "group": "read",
+      "expect": "\"runAsUser\":0",
+      "components": [
+        "kubeproxy"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "admin",
+          "rc": 0,
+          "output": "daemon set \"kube-proxy\" successfully rolled out\n{\"privileged\":true,\"runAsGroup\":0,\"runAsUser\":0} 10.77.0.1:5000/kube-proxy:v1.36.6@sha256:690fd8d24cd4ffbf70dbe1ba26ac48ce80a972d7183cf691948ff5ff8ca8d56c\nmode: \"\"",
+          "seconds": 1.2
+        }
+      ],
+      "ran_at": "2026-10-29T02:36:20Z"
+    },
+    "flannel": {
+      "section": "pod-network",
+      "target": {
+        "on": "admin"
+      },
+      "cmd": "kubectl -n kube-flannel rollout status ds/kube-flannel-ds --timeout=60s\nkubectl -n kube-flannel get pods -o wide",
+      "group": "read",
+      "expect": "successfully rolled out",
+      "components": [
+        "flannel",
+        "flannelcniplugin"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "admin",
+          "rc": 0,
+          "output": "daemon set \"kube-flannel-ds\" successfully rolled out\nNAME                    READY   STATUS    RESTARTS      AGE   IP           NODE      NOMINATED NODE   READINESS GATES\nkube-flannel-ds-586mr   1/1     Running   0             69m   10.77.0.13   kvs-cp3   <none>           <none>\nkube-flannel-ds-hnxsb   1/1     Running   2 (64m ago)   69m   10.77.0.11   kvs-cp1   <none>           <none>\nkube-flannel-ds-tfl6p   1/1     Running   0             69m   10.77.0.12   kvs-cp2   <none>           <none>",
+          "seconds": 1.1
+        }
+      ],
+      "ran_at": "2026-10-29T02:36:21Z"
+    },
+    "flannel-cni": {
+      "section": "pod-network",
+      "target": {
+        "on": "node",
+        "node": "each"
+      },
+      "cmd": "ls -l /opt/cni/bin/flannel\nsudo ls /etc/cni/net.d",
+      "group": "read",
+      "expect": "flannel",
+      "components": [
+        "flannelcniplugin",
+        "flannel"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "kvs-cp1",
+          "rc": 0,
+          "output": "-rwxr-xr-x 1 root root 3127742 Oct 29 01:31 /opt/cni/bin/flannel\n00-multus.conflist\n10-flannel.conflist\nmultus.d",
+          "seconds": 1.3
+        },
+        {
+          "where": "kvs-cp2",
+          "rc": 0,
+          "output": "-rwxr-xr-x 1 root root 3127742 Oct 29 01:27 /opt/cni/bin/flannel\n00-multus.conflist\n10-flannel.conflist\nmultus.d",
+          "seconds": 2.0
+        },
+        {
+          "where": "kvs-cp3",
+          "rc": 0,
+          "output": "-rwxr-xr-x 1 root root 3127742 Oct 29 01:27 /opt/cni/bin/flannel\n00-multus.conflist\n10-flannel.conflist\nmultus.d",
+          "seconds": 1.8
+        }
+      ],
+      "ran_at": "2026-10-29T02:36:22Z"
+    },
+    "multus": {
+      "section": "pod-network",
+      "target": {
+        "on": "admin"
+      },
+      "cmd": "kubectl -n kube-system rollout status ds/kube-multus-ds --timeout=60s\nkubectl get crd network-attachment-definitions.k8s.cni.cncf.io -o name",
+      "group": "read",
+      "expect": "network-attachment-definitions",
+      "components": [
+        "multuscni"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "admin",
+          "rc": 0,
+          "output": "daemon set \"kube-multus-ds\" successfully rolled out\ncustomresourcedefinition.apiextensions.k8s.io/network-attachment-definitions.k8s.cni.cncf.io",
+          "seconds": 1.0
+        }
+      ],
+      "ran_at": "2026-10-29T02:36:27Z"
+    },
+    "cluster-dns": {
+      "section": "pod-network",
+      "target": {
+        "on": "admin"
+      },
+      "cmd": "kubectl -n kube-system get svc kube-dns\nkubectl -n kube-system get endpointslices -l kubernetes.io/service-name=kube-dns",
+      "group": "read",
+      "expect": "kube-dns",
+      "components": [
+        "kubeproxy"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "admin",
+          "rc": 0,
+          "output": "NAME       TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)                  AGE\nkube-dns   ClusterIP   10.96.0.10   <none>        53/UDP,53/TCP,9153/TCP   72m\nNAME             ADDRESSTYPE   PORTS        ENDPOINTS               AGE\nkube-dns-q4nnn   IPv4          53,53,9153   10.244.1.2,10.244.1.3   72m",
+          "seconds": 1.7
+        }
+      ],
+      "ran_at": "2026-10-29T02:36:28Z"
+    },
+    "coredns-respread": {
+      "section": "coredns-spread",
+      "target": {
+        "on": "admin"
+      },
+      "cmd": "echo \"before: $(kubectl -n kube-system get pods -l k8s-app=kube-dns -o jsonpath='{range .items[*]}{.spec.nodeName}{\" \"}{end}')\"\nkubectl -n kube-system rollout restart deployment/coredns\nkubectl -n kube-system rollout status deployment/coredns --timeout=300s\necho \"after: restarted\"",
+      "group": "write",
+      "expect": "^after: ",
+      "components": [],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "admin",
+          "rc": 0,
+          "output": "before: kvs-cp2 kvs-cp2 \ndeployment.apps/coredns restarted\nWaiting for deployment spec update to be observed...\nWaiting for deployment \"coredns\" rollout to finish: 1 out of 2 new replicas have been updated...\nWaiting for deployment \"coredns\" rollout to finish: 1 out of 2 new replicas have been updated...\nWaiting for deployment \"coredns\" rollout to finish: 1 old replicas are pending termination...\nWaiting for deployment \"coredns\" rollout to finish: 1 old replicas are pending termination...\nWaiting for deployment \"coredns\" rollout to finish: 1 old replicas are pending termination...\nWaiting for deployment \"coredns\" rollout to finish: 1 of 2 updated replicas are available...\nWaiting for deployment \"coredns\" rollout to finish: 1 of 2 updated replicas are available...\nWaiting for deployment \"coredns\" rollout to finish: 1 of 2 updated replicas are available...\ndeployment \"coredns\" successfully rolled out\nafter: restarted",
+          "seconds": 15.0
+        }
+      ],
+      "ran_at": "2026-10-29T02:39:40Z"
+    },
+    "coredns-spread": {
+      "section": "coredns-spread",
+      "target": {
+        "on": "admin"
+      },
+      "cmd": "want=$(kubectl -n kube-system get deployment coredns -o jsonpath='{.spec.replicas}')\nfor i in $(seq 1 30); do [ \"$(kubectl -n kube-system get pods -l k8s-app=kube-dns --no-headers | wc -l)\" = \"$want\" ] && break; sleep 2; done\nkubectl -n kube-system get pods -l k8s-app=kube-dns -o wide\nn=$(kubectl -n kube-system get pods -l k8s-app=kube-dns -o jsonpath='{range .items[*]}{.spec.nodeName}{\"\\n\"}{end}' | sort -u | wc -l)\necho \"CoreDNS on $n node(s)\"\n[ \"$n\" -ge 2 ]",
+      "group": "read",
+      "expect": "CoreDNS on [2-9] node",
+      "components": [],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "admin",
+          "rc": 0,
+          "output": "NAME                       READY   STATUS    RESTARTS   AGE   IP            NODE      NOMINATED NODE   READINESS GATES\ncoredns-7898b9657f-mcbs7   1/1     Running   0          14s   10.244.0.10   kvs-cp1   <none>           <none>\ncoredns-7898b9657f-xzhb8   1/1     Running   0          15s   10.244.2.11   kvs-cp3   <none>           <none>\nCoreDNS on 2 node(s)",
+          "seconds": 1.3
+        }
+      ],
+      "ran_at": "2026-10-29T02:39:55Z"
+    },
+    "host-bridge": {
+      "section": "uplink-bridge",
+      "target": {
+        "on": "node",
+        "node": "each"
+      },
+      "cmd": "ip -br addr show br0\nip -br link show master br0\nip route show default",
+      "group": "read",
+      "expect": "dev br0",
+      "components": [
+        "multuscni",
+        "kubevip",
+        "virthandler",
+        "virtlauncher"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "kvs-cp1",
+          "rc": 0,
+          "output": "br0              UP             10.77.0.11/24 fe80::5054:ff:fe77:b/64 \nenp1s0           UP             52:54:00:77:00:0b <BROADCAST,MULTICAST,UP,LOWER_UP> \nvethbc466fa2@if3 UP             aa:ec:a0:e7:6b:67 <BROADCAST,MULTICAST,UP,LOWER_UP> \ndefault via 10.77.0.1 dev br0 proto static ",
+          "seconds": 1.4
+        },
+        {
+          "where": "kvs-cp2",
+          "rc": 0,
+          "output": "br0              UP             10.77.0.12/24 10.77.0.10/32 fe80::5054:ff:fe77:c/64 \nenp1s0           UP             52:54:00:77:00:0c <BROADCAST,MULTICAST,UP,LOWER_UP> \nveth6c6c498d@if3 UP             f2:e1:4d:11:7a:1b <BROADCAST,MULTICAST,UP,LOWER_UP> \ndefault via 10.77.0.1 dev br0 proto static ",
+          "seconds": 1.3
+        },
+        {
+          "where": "kvs-cp3",
+          "rc": 0,
+          "output": "br0              UP             10.77.0.13/24 fe80::5054:ff:fe77:d/64 \nenp1s0           UP             52:54:00:77:00:0d <BROADCAST,MULTICAST,UP,LOWER_UP> \ndefault via 10.77.0.1 dev br0 proto static ",
+          "seconds": 1.3
+        }
+      ],
+      "ran_at": "2026-10-29T02:36:31Z"
+    },
+    "nad": {
+      "section": "uplink-bridge",
+      "target": {
+        "on": "admin"
+      },
+      "cmd": "kubectl get network-attachment-definitions -A",
+      "group": "read",
+      "expect": "host-bridge",
+      "components": [
+        "multuscni"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "admin",
+          "rc": 0,
+          "output": "NAMESPACE   NAME          AGE\ndefault     host-bridge   67m",
+          "seconds": 1.0
+        }
+      ],
+      "ran_at": "2026-10-29T02:36:35Z"
+    },
+    "kubevirt-available": {
+      "section": "kubevirt",
+      "target": {
+        "on": "admin"
+      },
+      "cmd": "kubectl -n kubevirt get kv kubevirt -o jsonpath='{range .status.conditions[*]}{.type}={.status} ({.reason}){\"\\n\"}{end}'\nkubectl -n kubevirt get pods -o wide",
+      "group": "read",
+      "expect": "Available=True",
+      "components": [
+        "virtoperator",
+        "virtapi",
+        "virtcontroller",
+        "virthandler",
+        "virtexportproxy"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "admin",
+          "rc": 0,
+          "output": "Available=True (AllComponentsReady)\nProgressing=False (AllComponentsReady)\nDegraded=False (AllComponentsReady)\nCreated=True (AllResourcesCreated)\nNAME                                READY   STATUS    RESTARTS   AGE   IP           NODE      NOMINATED NODE   READINESS GATES\nvirt-api-b7d659dff-hf7tj            1/1     Running   0          62m   10.244.0.6   kvs-cp1   <none>           <none>\nvirt-api-b7d659dff-n7dgk            1/1     Running   0          60m   10.244.2.8   kvs-cp3   <none>           <none>\nvirt-controller-6f48497865-qqw6d    1/1     Running   0          61m   10.244.1.5   kvs-cp2   <none>           <none>\nvirt-controller-6f48497865-t9w6v    1/1     Running   0          61m   10.244.0.7   kvs-cp1   <none>           <none>\nvirt-exportproxy-75fbd54d97-24z8t   1/1     Running   0          61m   10.244.1.6   kvs-cp2   <none>           <none>\nvirt-exportproxy-75fbd54d97-v2m2j   1/1     Running   0          61m   10.244.1.7   kvs-cp2   <none>           <none>\nvirt-handler-f4fgr                  1/1     Running   0          61m   10.244.0.8   kvs-cp1   <none>           <none>\nvirt-handler-j9xsd                  1/1     Running   0          61m   10.244.1.8   kvs-cp2   <none>           <none>\nvirt-handler-jkl6x                  1/1     Running   0          61m   10.244.2.7   kvs-cp3   <none>           <none>\nvirt-operator-6b7f7b7588-rhffw      1/1     Running   0          63m   10.244.2.5   kvs-cp3   <none>           <none>\nvirt-operator-6b7f7b7588-wf9t5      1/1     Running   0          63m   10.244.0.4   kvs-cp1   <none>           <none>",
+          "seconds": 1.1
+        }
+      ],
+      "ran_at": "2026-10-29T02:36:36Z"
+    },
+    "kubevirt-images": {
+      "section": "kubevirt",
+      "target": {
+        "on": "admin"
+      },
+      "cmd": "kubectl -n kubevirt get deploy,ds -o custom-columns='NAME:.metadata.name,READY:.status.readyReplicas,IMAGE:.spec.template.spec.containers[0].image'",
+      "group": "read",
+      "expect": "virt-handler",
+      "components": [
+        "virtoperator",
+        "virtapi",
+        "virtcontroller",
+        "virthandler",
+        "virtexportproxy",
+        "virtlauncher"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "admin",
+          "rc": 0,
+          "output": "NAME               READY    IMAGE\nvirt-api           2        10.77.0.1:5000/kubevirt/virt-api@sha256:3b9821f4de2decd949a4e7fba4bdf724226c652544384195ac534b9daf03947a\nvirt-controller    2        10.77.0.1:5000/kubevirt/virt-controller@sha256:e3b93539f7842851fb18c45508542f5c842280e30a9f9a35aee15ad8a43ac6af\nvirt-exportproxy   2        10.77.0.1:5000/kubevirt/virt-exportproxy@sha256:08ae58dc5e2f7d70df82e138252444bb59bd1929758ba6a293c72e564efd6649\nvirt-operator      2        10.77.0.1:5000/kubevirt/virt-operator@sha256:7e27c9489846f1328ecba4006654c2938a4596ea1c7a6e0cef45287f4abfa078\nvirt-handler       <none>   10.77.0.1:5000/kubevirt/virt-handler@sha256:6136df8f03ae550fa9b376e0ca210f14be9f2b876c0cd90e44fec40965bff824",
+          "seconds": 0.9
+        }
+      ],
+      "ran_at": "2026-10-29T02:36:37Z"
+    },
+    "virt-handler-spec": {
+      "section": "kubevirt",
+      "target": {
+        "on": "admin"
+      },
+      "cmd": "kubectl -n kubevirt get ds virt-handler -o jsonpath='{range .spec.template.spec.initContainers[*]}init {.name}: {.securityContext}{\"\\n\"}{end}{range .spec.template.spec.containers[*]}{.name}: {.securityContext}{\"\\n\"}{end}'",
+      "group": "read",
+      "expect": "\"runAsUser\":0",
+      "components": [
+        "virthandler",
+        "virtlauncher"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "admin",
+          "rc": 0,
+          "output": "init virt-launcher: {\"privileged\":true,\"runAsUser\":0}\nvirt-handler: {\"privileged\":true,\"runAsUser\":0,\"seLinuxOptions\":{\"level\":\"s0\"}}",
+          "seconds": 0.9
+        }
+      ],
+      "ran_at": "2026-10-29T02:36:38Z"
+    },
+    "virt-handler-uid": {
+      "section": "kubevirt",
+      "target": {
+        "on": "node",
+        "node": "each"
+      },
+      "cmd": "ps -eo uid,args | grep -E '[v]irt-handler( |$)' | head -n 1 | awk '{print $1, $2}'",
+      "group": "read",
+      "expect": "^\\s*0 virt-handler",
+      "components": [
+        "virthandler"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "kvs-cp1",
+          "rc": 0,
+          "output": "0 virt-handler",
+          "seconds": 1.3
+        },
+        {
+          "where": "kvs-cp2",
+          "rc": 0,
+          "output": "0 virt-handler",
+          "seconds": 1.4
+        },
+        {
+          "where": "kvs-cp3",
+          "rc": 0,
+          "output": "0 virt-handler",
+          "seconds": 1.4
+        }
+      ],
+      "ran_at": "2026-10-29T02:36:39Z"
+    },
+    "virt-operator-user": {
+      "section": "kubevirt",
+      "target": {
+        "on": "debug",
+        "ns": "kubevirt",
+        "selector": "kubevirt.io=virt-operator",
+        "container": "virt-operator"
+      },
+      "cmd": "grep -E '^(Uid|Gid):' /proc/1/status",
+      "group": "read",
+      "expect": "Uid:\\s+[1-9]",
+      "components": [
+        "virtoperator"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "debug kubevirt/virt-operator (kubevirt.io=virt-operator)",
+          "rc": 0,
+          "output": "Uid:\t1001\t1001\t1001\t1001\nGid:\t1001\t1001\t1001\t1001",
+          "seconds": 3.7
+        }
+      ],
+      "ran_at": "2026-10-29T02:36:43Z"
+    },
+    "virt-api-user": {
+      "section": "kubevirt",
+      "target": {
+        "on": "debug",
+        "ns": "kubevirt",
+        "selector": "kubevirt.io=virt-api",
+        "container": "virt-api"
+      },
+      "cmd": "grep -E '^(Uid|Gid):' /proc/1/status",
+      "group": "read",
+      "expect": "Uid:\\s+[1-9]",
+      "components": [
+        "virtapi"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "debug kubevirt/virt-api (kubevirt.io=virt-api)",
+          "rc": 0,
+          "output": "Uid:\t1001\t1001\t1001\t1001\nGid:\t1001\t1001\t1001\t1001",
+          "seconds": 3.7
+        }
+      ],
+      "ran_at": "2026-10-29T02:36:47Z"
+    },
+    "virt-controller-user": {
+      "section": "kubevirt",
+      "target": {
+        "on": "debug",
+        "ns": "kubevirt",
+        "selector": "kubevirt.io=virt-controller",
+        "container": "virt-controller"
+      },
+      "cmd": "grep -E '^(Uid|Gid):' /proc/1/status",
+      "group": "read",
+      "expect": "Uid:\\s+[1-9]",
+      "components": [
+        "virtcontroller"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "debug kubevirt/virt-controller (kubevirt.io=virt-controller)",
+          "rc": 0,
+          "output": "Uid:\t1001\t1001\t1001\t1001\nGid:\t1001\t1001\t1001\t1001",
+          "seconds": 3.7
+        }
+      ],
+      "ran_at": "2026-10-29T02:36:51Z"
+    },
+    "virt-exportproxy-user": {
+      "section": "kubevirt",
+      "target": {
+        "on": "debug",
+        "ns": "kubevirt",
+        "selector": "kubevirt.io=virt-exportproxy",
+        "container": "exportproxy"
+      },
+      "cmd": "grep -E '^(Uid|Gid):' /proc/1/status",
+      "group": "read",
+      "expect": "Uid:\\s+[1-9]",
+      "components": [
+        "virtexportproxy"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "debug kubevirt/exportproxy (kubevirt.io=virt-exportproxy)",
+          "rc": 0,
+          "output": "Uid:\t1001\t1001\t1001\t1001\nGid:\t1001\t1001\t1001\t1001",
+          "seconds": 3.8
+        }
+      ],
+      "ran_at": "2026-10-29T02:36:54Z"
+    },
+    "vm-manifest": {
+      "section": "vm",
+      "target": {
+        "on": "admin"
+      },
+      "cmd": "export VM_NAME=runbook-example VM_NAMESPACE=default VM_DISK_DIR=/var/lib/vm-disks/runbook-example VM_DISK_SIZE=1Gi\nexport VM_CPUS=1 VM_MEMORY=256Mi NAD_NAME=host-bridge VM_NODE=$(kubectl get nodes -o jsonpath='{.items[0].metadata.name}')\nenvsubst '${VM_NAME} ${VM_NAMESPACE} ${VM_NODE} ${VM_DISK_DIR} ${VM_DISK_SIZE} ${VM_CPUS} ${VM_MEMORY} ${NAD_NAME}' \\\n  < local-disk-vm.yaml | kubectl apply --dry-run=server -f -",
+      "group": "read",
+      "expect": "virtualmachine.kubevirt.io/runbook-example created \\(server dry run\\)",
+      "components": [
+        "virtapi",
+        "virtcontroller"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "admin",
+          "rc": 0,
+          "output": "storageclass.storage.k8s.io/local-static unchanged (server dry run)\npersistentvolume/runbook-example-disk created (server dry run)\npersistentvolumeclaim/runbook-example-disk created (server dry run)\nvirtualmachine.kubevirt.io/runbook-example created (server dry run)",
+          "seconds": 1.6
+        }
+      ],
+      "ran_at": "2026-10-29T02:36:58Z"
+    },
+    "vm-running": {
+      "section": "vm",
+      "target": {
+        "on": "admin"
+      },
+      "cmd": "kubectl get vm,vmi -A -o wide",
+      "group": "read",
+      "expect": "Running",
+      "components": [
+        "virtlauncher",
+        "virthandler",
+        "virtcontroller"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "admin",
+          "rc": 0,
+          "output": "NAMESPACE   NAME                                    AGE   STATUS    READY\ndefault     virtualmachine.kubevirt.io/kvs-cirros   58m   Running   True\n\nNAMESPACE   NAME                                            AGE   PHASE     IP           NODENAME   READY   LIVE-MIGRATABLE   PAUSED\ndefault     virtualmachineinstance.kubevirt.io/kvs-cirros   58m   Running   10.244.1.9   kvs-cp2    True    False             ",
+          "seconds": 0.9
+        }
+      ],
+      "ran_at": "2026-10-29T02:37:00Z"
+    },
+    "vm-launcher": {
+      "section": "vm",
+      "target": {
+        "on": "admin"
+      },
+      "cmd": "set -- $(kubectl get pods -A -l kubevirt.io=virt-launcher -o jsonpath='{.items[0].metadata.namespace} {.items[0].metadata.name}')\nkubectl get pod -n \"$1\" \"$2\" -o jsonpath='{.spec.securityContext}{\"\\n\"}{range .spec.containers[*]}{.name} {.image}{\"\\n\"}{end}'\nkubectl exec -n \"$1\" \"$2\" -c compute -- virsh -c 'qemu+unix:///session?socket=/var/run/libvirt/virtqemud-sock' dumpxml 1 | grep -m 1 '<domain type'",
+      "group": "read",
+      "expect": "<domain type='kvm'",
+      "components": [
+        "virtlauncher"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "admin",
+          "rc": 0,
+          "output": "{\"fsGroup\":107,\"runAsGroup\":107,\"runAsNonRoot\":true,\"runAsUser\":107}\ncompute 10.77.0.1:5000/kubevirt/virt-launcher@sha256:ae22cd3068d148beaef04c912cecab732bedac61a7ac538f6fbee8cb1d884904\n<domain type='kvm' id='1'>",
+          "seconds": 1.4
+        }
+      ],
+      "ran_at": "2026-10-29T02:37:01Z"
+    },
+    "virtctl-version": {
+      "section": "vm",
+      "target": {
+        "on": "admin"
+      },
+      "cmd": "virtctl version --client",
+      "group": "read",
+      "expect": "GitVersion",
+      "components": [
+        "virtctl"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "admin",
+          "rc": 0,
+          "output": "Client Version: version.Info{GitVersion:\"v1.9.1\", GitCommit:\"c3d19093f9c7b843b3879b18dc088911c081c39e\", GitTreeState:\"clean\", BuildDate:\"2026-10-09T05:21:13Z\", GoVersion:\"go1.26.10\", Compiler:\"gc\", Platform:\"linux/amd64\"}",
+          "seconds": 0.8
+        }
+      ],
+      "ran_at": "2026-10-29T02:37:02Z"
+    },
+    "state-dirs": {
+      "section": "state",
+      "target": {
+        "on": "node",
+        "node": "each"
+      },
+      "cmd": "sudo ls -ld /var/lib/etcd /etc/kubernetes/pki /var/lib/kubelet\nsudo du -sh /var/lib/etcd",
+      "group": "read",
+      "expect": "/var/lib/etcd",
+      "components": [
+        "kubernetesnode"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "kvs-cp1",
+          "rc": 0,
+          "output": "drwxr-xr-x  3 root root 4096 Oct 29 01:23 /etc/kubernetes/pki\ndrwx------  3 root root 4096 Oct 29 01:31 /var/lib/etcd\ndrwxr-xr-x 11 root root 4096 Oct 29 02:36 /var/lib/kubelet\n137M\t/var/lib/etcd",
+          "seconds": 2.7
+        },
+        {
+          "where": "kvs-cp2",
+          "rc": 0,
+          "output": "drwxr-xr-x  3 root root 4096 Oct 29 01:25 /etc/kubernetes/pki\ndrwx------  3 root root 4096 Oct 29 01:25 /var/lib/etcd\ndrwxr-xr-x 11 root root 4096 Oct 29 02:36 /var/lib/kubelet\n136M\t/var/lib/etcd",
+          "seconds": 2.0
+        },
+        {
+          "where": "kvs-cp3",
+          "rc": 0,
+          "output": "drwxr-xr-x  3 root root 4096 Oct 29 01:26 /etc/kubernetes/pki\ndrwx------  3 root root 4096 Oct 29 01:26 /var/lib/etcd\ndrwxr-xr-x 11 root root 4096 Oct 29 02:36 /var/lib/kubelet\n137M\t/var/lib/etcd",
+          "seconds": 1.9
+        }
+      ],
+      "ran_at": "2026-10-29T02:37:03Z"
+    },
+    "persistent-volumes": {
+      "section": "state",
+      "target": {
+        "on": "admin"
+      },
+      "cmd": "kubectl get pv -o wide",
+      "group": "read",
+      "expect": "",
+      "components": [
+        "virtlauncher"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "admin",
+          "rc": 0,
+          "output": "NAME              CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                     STORAGECLASS   VOLUMEATTRIBUTESCLASS   REASON   AGE   VOLUMEMODE\nkvs-cirros-disk   1Gi        RWO            Retain           Bound    default/kvs-cirros-disk   local-static   <unset>                          58m   Filesystem",
+          "seconds": 0.9
+        }
+      ],
+      "ran_at": "2026-10-29T02:37:09Z"
+    },
+    "etcd-members": {
+      "section": "etcd-backup",
+      "target": {
+        "on": "node",
+        "node": "any"
+      },
+      "cmd": "ETCD=$(sudo crictl ps -q --name '^etcd$' | head -n 1)\nsudo crictl exec \"$ETCD\" etcdctl --endpoints=https://127.0.0.1:2379 --cacert /etc/kubernetes/pki/etcd/ca.crt \\\n  --cert /etc/kubernetes/pki/etcd/server.crt --key /etc/kubernetes/pki/etcd/server.key member list -w table\nsudo crictl exec \"$ETCD\" etcdctl --endpoints=https://127.0.0.1:2379 --cacert /etc/kubernetes/pki/etcd/ca.crt \\\n  --cert /etc/kubernetes/pki/etcd/server.crt --key /etc/kubernetes/pki/etcd/server.key endpoint health --cluster -w table",
+      "group": "read",
+      "expect": "started",
+      "components": [
+        "kubeapiserver"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "kvs-cp1",
+          "rc": 0,
+          "output": "\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502        ID        \u2502 STATUS  \u2502  NAME   \u2502       PEER ADDRS        \u2502      CLIENT ADDRS       \u2502 IS LEARNER \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 252902638f78db76 \u2502 started \u2502 kvs-cp1 \u2502 https://10.77.0.11:2380 \u2502 https://10.77.0.11:2379 \u2502      false \u2502\n\u2502 66ceab29ada86722 \u2502 started \u2502 kvs-cp3 \u2502 https://10.77.0.13:2380 \u2502 https://10.77.0.13:2379 \u2502      false \u2502\n\u2502 7bb4b24ed6c43083 \u2502 started \u2502 kvs-cp2 \u2502 https://10.77.0.12:2380 \u2502 https://10.77.0.12:2379 \u2502      false \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502        ENDPOINT         \u2502 HEALTH \u2502    TOOK     \u2502 ERROR \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 https://10.77.0.12:2379 \u2502   true \u2502 31.595648ms \u2502       \u2502\n\u2502 https://10.77.0.11:2379 \u2502   true \u2502 39.049244ms \u2502       \u2502\n\u2502 https://10.77.0.13:2379 \u2502   true \u2502 43.425303ms \u2502       \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518",
+          "seconds": 2.4
+        }
+      ],
+      "ran_at": "2026-10-29T02:37:10Z"
+    },
+    "etcd-snapshot": {
+      "section": "etcd-backup",
+      "target": {
+        "on": "node",
+        "node": "any"
+      },
+      "cmd": "ETCD=$(sudo crictl ps -q --name '^etcd$' | head -n 1)\nsnap=snapshot-$(date -u +%Y%m%dT%H%M%SZ).db\nsudo crictl exec \"$ETCD\" etcdctl --endpoints=https://127.0.0.1:2379 --cacert /etc/kubernetes/pki/etcd/ca.crt \\\n  --cert /etc/kubernetes/pki/etcd/server.crt --key /etc/kubernetes/pki/etcd/server.key snapshot save \"/var/lib/etcd/$snap\"\nsudo crictl exec \"$ETCD\" etcdutl snapshot status \"/var/lib/etcd/$snap\" -w table\nsudo crictl exec \"$ETCD\" etcdutl snapshot restore \"/var/lib/etcd/$snap\" --data-dir /var/lib/etcd/restore-check \\\n  && echo \"Snapshot restored into a scratch directory\"\nsudo rm -rf /var/lib/etcd/restore-check\nsudo install -d -m 700 /var/backups/etcd\nsudo mv \"/var/lib/etcd/$snap\" /var/backups/etcd/\nsudo ls -l /var/backups/etcd",
+      "group": "write",
+      "expect": "Snapshot restored",
+      "components": [
+        "kubeapiserver"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "kvs-cp1",
+          "rc": 0,
+          "output": "{\"level\":\"info\",\"ts\":\"2026-10-29T02:37:14.336682Z\",\"caller\":\"snapshot/v3_snapshot.go:83\",\"msg\":\"created temporary db file\",\"path\":\"/var/lib/etcd/snapshot-20261029T023714Z.db.part\"}\n{\"level\":\"info\",\"ts\":\"2026-10-29T02:37:14.359232Z\",\"logger\":\"client\",\"caller\":\"v3@v3.7.3/maintenance.go:236\",\"msg\":\"opened snapshot stream; downloading\"}\n{\"level\":\"info\",\"ts\":\"2026-10-29T02:37:14.371846Z\",\"caller\":\"snapshot/v3_snapshot.go:96\",\"msg\":\"fetching snapshot\",\"endpoint\":\"https://127.0.0.1:2379\"}\n{\"level\":\"info\",\"ts\":\"2026-10-29T02:37:15.580201Z\",\"logger\":\"client\",\"caller\":\"v3@v3.7.3/maintenance.go:302\",\"msg\":\"completed snapshot read; closing\"}\n{\"level\":\"info\",\"ts\":\"2026-10-29T02:37:15.661772Z\",\"caller\":\"snapshot/v3_snapshot.go:111\",\"msg\":\"fetched snapshot\",\"endpoint\":\"https://127.0.0.1:2379\",\"size\":\"15 MB\",\"took\":\"1.323587161s\",\"etcd-version\":\"3.7.0\"}\n{\"level\":\"info\",\"ts\":\"2026-10-29T02:37:15.662484Z\",\"caller\":\"snapshot/v3_snapshot.go:121\",\"msg\":\"saved\",\"path\":\"/var/lib/etcd/snapshot-20261029T023714Z.db\"}\nSnapshot saved at /var/lib/etcd/snapshot-20261029T023714Z.db\nServer version 3.7.0\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502   HASH   \u2502 REVISION \u2502 TOTAL KEYS \u2502 TOTAL SIZE \u2502 VERSION \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 c68a9619 \u2502    17359 \u2502        671 \u2502      15 MB \u2502   3.7.0 \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n2026-10-29T02:37:16Z\tinfo\tsnapshot/v3_snapshot.go:306\trestoring snapshot\t{\"path\": \"/var/lib/etcd/snapshot-20261029T023714Z.db\", \"wal-dir\": \"/var/lib/etcd/restore-check/member/wal\", \"data-dir\": \"/var/lib/etcd/restore-check\", \"snap-dir\": \"/var/lib/etcd/restore-check/member/snap\", \"initial-memory-map-size\": 10737418240}\n2026-10-29T02:37:16Z\tinfo\tbbolt\tbackend/backend.go:213\tOpening db file (/var/lib/etcd/restore-check/member/snap/db) with mode -rw------- and with options: {Timeout: 0s, NoGrowSync: false, NoFreelistSync: true, PreLoadFreelist: false, FreelistType: , ReadOnly: false, MmapFlags: 8000, InitialMmapSize: 10737418240, PageSize: 0, MaxSize: 0, NoSync: false, OpenFile: 0x0, Mlock: false, Logger: 0xb5cf8906a8, NoStatistics: false}\n2026-10-29T02:37:16Z\tinfo\tbbolt\tbbolt@v1.5.0/db.go:327\tOpening bbolt db (/var/lib/etcd/restore-check/member/snap/db) successfully\n2026-10-29T02:37:16Z\tinfo\tschema/membership.go:125\tTrimming membership information from the backend...\n2026-10-29T02:37:16Z\tinfo\tbbolt\tbackend/backend.go:213\tOpening db file (/var/lib/etcd/restore-check/member/snap/db) with mode -rw------- and with options: {Timeout: 0s, NoGrowSync: false, NoFreelistSync: true, PreLoadFreelist: false, FreelistType: , ReadOnly: false, MmapFlags: 8000, InitialMmapSize: 10737418240, PageSize: 0, MaxSize: 0, NoSync: false, OpenFile: 0x0, Mlock: false, Logger: 0xb5cf890470, NoStatistics: false}\n2026-10-29T02:37:16Z\tinfo\tbbolt\tbbolt@v1.5.0/db.go:327\tOpening bbolt db (/var/lib/etcd/restore-check/member/snap/db) successfully\n2026-10-29T02:37:16Z\tinfo\tmembership/cluster.go:408\tadded member\t{\"cluster-id\": \"cdf818194e3a8c32\", \"local-member-id\": \"0\", \"added-peer-id\": \"8e9e05c52164694d\", \"added-peer-peer-urls\": [\"http://localhost:2380\"], \"added-peer-is-learner\": false}\n2026-10-29T02:37:17Z\tinfo\tbbolt\tbackend/backend.go:213\tOpening db file (/var/lib/etcd/restore-check/member/snap/db) with mode -rw------- and with options: {Timeout: 0s, NoGrowSync: false, NoFreelistSync: true, PreLoadFreelist: false, FreelistType: , ReadOnly: false, MmapFlags: 8000, InitialMmapSize: 10737418240, PageSize: 0, MaxSize: 0, NoSync: false, OpenFile: 0x0, Mlock: false, Logger: 0xb5cf58a068, NoStatistics: false}\n2026-10-29T02:37:17Z\tinfo\tbbolt\tbbolt@v1.5.0/db.go:327\tOpening bbolt db (/var/lib/etcd/restore-check/member/snap/db) successfully\n2026-10-29T02:37:17Z\tinfo\tsnapshot/v3_snapshot.go:334\trestored snapshot\t{\"path\": \"/var/lib/etcd/snapshot-20261029T023714Z.db\", \"wal-dir\": \"/var/lib/etcd/restore-check/member/wal\", \"data-dir\": \"/var/lib/etcd/restore-check\", \"snap-dir\": \"/var/lib/etcd/restore-check/member/snap\", \"initial-memory-map-size\": 10737418240}\nSnapshot restored into a scratch directory\ntotal 14396\n-rw------- 1 root root 14737440 Oct 29 02:37 snapshot-20261029T023714Z.db",
+          "seconds": 4.6
+        }
+      ],
+      "ran_at": "2026-10-29T02:37:13Z"
+    },
+    "restore-marker-before": {
+      "section": "etcd-restore",
+      "target": {
+        "on": "admin"
+      },
+      "cmd": "kubectl delete configmap kf-restore-before --ignore-not-found\nkubectl create configmap kf-restore-before --from-literal=at=\"$(date -u +%FT%TZ)\"",
+      "group": "destructive",
+      "expect": "configmap/kf-restore-before created",
+      "components": [],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "admin",
+          "rc": 0,
+          "output": "configmap/kf-restore-before created",
+          "seconds": 1.0
+        }
+      ],
+      "ran_at": "2026-10-29T13:41:46Z"
+    },
+    "restore-backup": {
+      "section": "etcd-restore",
+      "target": {
+        "on": "node",
+        "node": "any"
+      },
+      "cmd": "ETCD=$(sudo crictl ps -q --name '^etcd$' | head -n 1)\nsnap=snapshot-$(date -u +%Y%m%dT%H%M%SZ).db\nsudo crictl exec \"$ETCD\" etcdctl --endpoints=https://127.0.0.1:2379 --cacert /etc/kubernetes/pki/etcd/ca.crt \\\n  --cert /etc/kubernetes/pki/etcd/server.crt --key /etc/kubernetes/pki/etcd/server.key snapshot save \"/var/lib/etcd/$snap\"\nsudo install -d -m 700 /var/backups/etcd\nsudo mv \"/var/lib/etcd/$snap\" /var/backups/etcd/ && sudo ls -l /var/backups/etcd",
+      "group": "destructive",
+      "expect": "Snapshot saved at /var/lib/etcd/snapshot-",
+      "components": [],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "kvs-cp1",
+          "rc": 0,
+          "output": "{\"level\":\"info\",\"ts\":\"2026-10-29T13:41:51.106241Z\",\"caller\":\"snapshot/v3_snapshot.go:83\",\"msg\":\"created temporary db file\",\"path\":\"/var/lib/etcd/snapshot-20261029T134149Z.db.part\"}\n{\"level\":\"info\",\"ts\":\"2026-10-29T13:41:51.186970Z\",\"logger\":\"client\",\"caller\":\"v3@v3.7.3/maintenance.go:236\",\"msg\":\"opened snapshot stream; downloading\"}\n{\"level\":\"info\",\"ts\":\"2026-10-29T13:41:51.202651Z\",\"caller\":\"snapshot/v3_snapshot.go:96\",\"msg\":\"fetching snapshot\",\"endpoint\":\"https://127.0.0.1:2379\"}\n{\"level\":\"info\",\"ts\":\"2026-10-29T13:41:52.118431Z\",\"logger\":\"client\",\"caller\":\"v3@v3.7.3/maintenance.go:302\",\"msg\":\"completed snapshot read; closing\"}\n{\"level\":\"info\",\"ts\":\"2026-10-29T13:41:52.187534Z\",\"caller\":\"snapshot/v3_snapshot.go:111\",\"msg\":\"fetched snapshot\",\"endpoint\":\"https://127.0.0.1:2379\",\"size\":\"14 MB\",\"took\":\"1.078762988s\",\"etcd-version\":\"3.7.0\"}\n{\"level\":\"info\",\"ts\":\"2026-10-29T13:41:52.188241Z\",\"caller\":\"snapshot/v3_snapshot.go:121\",\"msg\":\"saved\",\"path\":\"/var/lib/etcd/snapshot-20261029T134149Z.db\"}\nSnapshot saved at /var/lib/etcd/snapshot-20261029T134149Z.db\nServer version 3.7.0\ntotal 27912\n-rw------- 1 root root 14737440 Oct 29 02:37 snapshot-20261029T023714Z.db\n-rw------- 1 root root 13836320 Oct 29 13:41 snapshot-20261029T134149Z.db",
+          "seconds": 5.1
+        }
+      ],
+      "ran_at": "2026-10-29T13:41:48Z"
+    },
+    "restore-marker-after": {
+      "section": "etcd-restore",
+      "target": {
+        "on": "admin"
+      },
+      "cmd": "kubectl delete configmap kf-restore-after --ignore-not-found\nkubectl create configmap kf-restore-after --from-literal=at=\"$(date -u +%FT%TZ)\"",
+      "group": "destructive",
+      "expect": "configmap/kf-restore-after created",
+      "components": [],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "admin",
+          "rc": 0,
+          "output": "configmap/kf-restore-after created",
+          "seconds": 1.1
+        }
+      ],
+      "ran_at": "2026-10-29T13:41:53Z"
+    },
+    "restore-from-backup": {
+      "section": "etcd-restore",
+      "target": {
+        "on": "node",
+        "node": "any"
+      },
+      "cmd": "b=$(sudo ls -1t /var/backups/etcd | grep '\\.db$' | head -n 1)\n[ -n \"$b\" ] || { echo \"no backup in /var/backups/etcd\"; exit 1; }\necho \"the newest kept backup: /var/backups/etcd/$b\"\nsudo install -m 600 \"/var/backups/etcd/$b\" /var/lib/etcd/restore.db\nsudo sha256sum \"/var/backups/etcd/$b\" /var/lib/etcd/restore.db\n[ \"$(sudo sha256sum \"/var/backups/etcd/$b\" /var/lib/etcd/restore.db | cut -c1-64 | sort -u | wc -l)\" = 1 ] || exit 1\nETCD=$(sudo crictl ps -q --name '^etcd$' | head -n 1)\nsudo crictl exec \"$ETCD\" etcdutl snapshot status /var/lib/etcd/restore.db -w table && echo \"restore.db: the kept backup $b\"",
+      "group": "destructive",
+      "expect": "restore.db: the kept backup snapshot-",
+      "components": [],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "kvs-cp1",
+          "rc": 0,
+          "output": "the newest kept backup: /var/backups/etcd/snapshot-20261029T134149Z.db\n7bd9bfe9975e07f6e5e8bd33752358fe7c5db5304b2c7166e8da80f20a8d5ab9  /var/backups/etcd/snapshot-20261029T134149Z.db\n7bd9bfe9975e07f6e5e8bd33752358fe7c5db5304b2c7166e8da80f20a8d5ab9  /var/lib/etcd/restore.db\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502   HASH   \u2502 REVISION \u2502 TOTAL KEYS \u2502 TOTAL SIZE \u2502 VERSION \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 ecefb3d3 \u2502    33785 \u2502        616 \u2502      14 MB \u2502   3.7.0 \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\nrestore.db: the kept backup snapshot-20261029T134149Z.db",
+          "seconds": 3.2
+        }
+      ],
+      "ran_at": "2026-10-29T13:41:54Z"
+    },
+    "restore-copy": {
+      "section": "etcd-restore",
+      "target": {
+        "on": "admin"
+      },
+      "cmd": "umask 077; d=$(mktemp -d)\nssh kvs-cp1 'sudo cat /var/lib/etcd/restore.db' > \"$d/restore.db\"\nsha256sum \"$d/restore.db\" | cut -c1-64\nfor n in kvs-cp2 kvs-cp3; do\n  ssh \"$n\" 'sudo sh -c \"umask 077; cat > /var/lib/etcd/restore.db\"' < \"$d/restore.db\"\n  ssh \"$n\" 'sudo sha256sum /var/lib/etcd/restore.db' | cut -c1-64\ndone\nrm -rf \"$d\"\necho \"restore.db: copied to 2 nodes\"",
+      "group": "destructive",
+      "expect": "restore.db: copied to 2 node",
+      "components": [],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "admin",
+          "rc": 0,
+          "output": "7bd9bfe9975e07f6e5e8bd33752358fe7c5db5304b2c7166e8da80f20a8d5ab9\n7bd9bfe9975e07f6e5e8bd33752358fe7c5db5304b2c7166e8da80f20a8d5ab9\n7bd9bfe9975e07f6e5e8bd33752358fe7c5db5304b2c7166e8da80f20a8d5ab9\nrestore.db: copied to 2 nodes",
+          "seconds": 8.1
+        }
+      ],
+      "ran_at": "2026-10-29T13:41:57Z"
+    },
+    "restore-members": {
+      "section": "etcd-restore",
+      "target": {
+        "on": "node",
+        "node": "each"
+      },
+      "cmd": "ETCD=$(sudo crictl ps -q --name '^etcd$' | head -n 1)\nC=\"--endpoints=https://127.0.0.1:2379 --cacert /etc/kubernetes/pki/etcd/ca.crt --cert /etc/kubernetes/pki/etcd/server.crt --key /etc/kubernetes/pki/etcd/server.key\"\nCLUSTER=$(sudo crictl exec \"$ETCD\" etcdctl $C member list -w simple | awk -F', ' '{print $3 \"=\" $4}' | paste -sd, -)\nNAME=$(sudo sed -n 's/.*--name=//p' /etc/kubernetes/manifests/etcd.yaml)\nPEER=$(sudo sed -n 's/.*--initial-advertise-peer-urls=//p' /etc/kubernetes/manifests/etcd.yaml)\necho \"member $NAME at $PEER; cluster $CLUSTER\"\nsudo rm -rf /var/lib/etcd/restored\nsudo crictl exec \"$ETCD\" etcdutl snapshot restore /var/lib/etcd/restore.db --name \"$NAME\" --initial-cluster \"$CLUSTER\" \\\n  --initial-cluster-token kf-restore --initial-advertise-peer-urls \"$PEER\" --data-dir /var/lib/etcd/restored \\\n  --bump-revision 1000000000 --mark-compacted\nsudo test -d /var/lib/etcd/restored/member && echo \"restored: member $NAME\"",
+      "group": "destructive",
+      "expect": "restored: member",
+      "components": [],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "kvs-cp1",
+          "rc": 0,
+          "output": "member kvs-cp1 at https://10.77.0.11:2380; cluster kvs-cp1=https://10.77.0.11:2380,kvs-cp3=https://10.77.0.13:2380,kvs-cp2=https://10.77.0.12:2380\n2026-10-29T13:42:06Z\tinfo\tsnapshot/v3_snapshot.go:306\trestoring snapshot\t{\"path\": \"/var/lib/etcd/restore.db\", \"wal-dir\": \"/var/lib/etcd/restored/member/wal\", \"data-dir\": \"/var/lib/etcd/restored\", \"snap-dir\": \"/var/lib/etcd/restored/member/snap\", \"initial-memory-map-size\": 10737418240}\n2026-10-29T13:42:07Z\tinfo\tbbolt\tbackend/backend.go:213\tOpening db file (/var/lib/etcd/restored/member/snap/db) with mode -rw------- and with options: {Timeout: 0s, NoGrowSync: false, NoFreelistSync: true, PreLoadFreelist: false, FreelistType: , ReadOnly: false, MmapFlags: 8000, InitialMmapSize: 10737418240, PageSize: 0, MaxSize: 0, NoSync: false, OpenFile: 0x0, Mlock: false, Logger: 0x3d486531e9b0, NoStatistics: false}\n2026-10-29T13:42:07Z\tinfo\tbbolt\tbbolt@v1.5.0/db.go:327\tOpening bbolt db (/var/lib/etcd/restored/member/snap/db) successfully\n2026-10-29T13:42:07Z\tinfo\tschema/membership.go:125\tTrimming membership information from the backend...\n2026-10-29T13:42:07Z\tinfo\tbbolt\tbackend/backend.go:213\tOpening db file (/var/lib/etcd/restored/member/snap/db) with mode -rw------- and with options: {Timeout: 0s, NoGrowSync: false, NoFreelistSync: true, PreLoadFreelist: false, FreelistType: , ReadOnly: false, MmapFlags: 8000, InitialMmapSize: 10737418240, PageSize: 0, MaxSize: 0, NoSync: false, OpenFile: 0x0, Mlock: false, Logger: 0x3d486531e048, NoStatistics: false}\n2026-10-29T13:42:07Z\tinfo\tbbolt\tbbolt@v1.5.0/db.go:327\tOpening bbolt db (/var/lib/etcd/restored/member/snap/db) successfully\n2026-10-29T13:42:07Z\tinfo\tsnapshot/v3_snapshot.go:397\tbumping latest revision\t{\"latest-revision\": 33785, \"bump-amount\": 1000000000, \"new-latest-revision\": 1000033785}\n2026-10-29T13:42:07Z\tinfo\tsnapshot/v3_snapshot.go:414\tmarking revision compacted\t{\"revision\": 1000033785}\n2026-10-29T13:42:07Z\tinfo\tbbolt\tbackend/backend.go:213\tOpening db file (/var/lib/etcd/restored/member/snap/db) with mode -rw------- and with options: {Timeout: 0s, NoGrowSync: false, NoFreelistSync: true, PreLoadFreelist: false, FreelistType: , ReadOnly: false, MmapFlags: 8000, InitialMmapSize: 10737418240, PageSize: 0, MaxSize: 0, NoSync: false, OpenFile: 0x0, Mlock: false, Logger: 0x3d486531e168, NoStatistics: false}\n2026-10-29T13:42:07Z\tinfo\tbbolt\tbbolt@v1.5.0/db.go:327\tOpening bbolt db (/var/lib/etcd/restored/member/snap/db) successfully\n2026-10-29T13:42:07Z\tinfo\tmembership/cluster.go:408\tadded member\t{\"cluster-id\": \"b042fcc30528c9b4\", \"local-member-id\": \"0\", \"added-peer-id\": \"373bcc9e961d6a95\", \"added-peer-peer-urls\": [\"https://10.77.0.12:2380\"], \"added-peer-is-learner\": false}\n2026-10-29T13:42:07Z\tinfo\tmembership/cluster.go:408\tadded member\t{\"cluster-id\": \"b042fcc30528c9b4\", \"local-member-id\": \"0\", \"added-peer-id\": \"e552263647e9824c\", \"added-peer-peer-urls\": [\"https://10.77.0.13:2380\"], \"added-peer-is-learner\": false}\n2026-10-29T13:42:07Z\tinfo\tmembership/cluster.go:408\tadded member\t{\"cluster-id\": \"b042fcc30528c9b4\", \"local-member-id\": \"0\", \"added-peer-id\": \"f47aa0c9c58efe1a\", \"added-peer-peer-urls\": [\"https://10.77.0.11:2380\"], \"added-peer-is-learner\": false}\n2026-10-29T13:42:07Z\tinfo\tbbolt\tbackend/backend.go:213\tOpening db file (/var/lib/etcd/restored/member/snap/db) with mode -rw------- and with options: {Timeout: 0s, NoGrowSync: false, NoFreelistSync: true, PreLoadFreelist: false, FreelistType: , ReadOnly: false, MmapFlags: 8000, InitialMmapSize: 10737418240, PageSize: 0, MaxSize: 0, NoSync: false, OpenFile: 0x0, Mlock: false, Logger: 0x3d486531e128, NoStatistics: false}\n2026-10-29T13:42:07Z\tinfo\tbbolt\tbbolt@v1.5.0/db.go:327\tOpening bbolt db (/var/lib/etcd/restored/member/snap/db) successfully\n2026-10-29T13:42:07Z\tinfo\tsnapshot/v3_snapshot.go:334\trestored snapshot\t{\"path\": \"/var/lib/etcd/restore.db\", \"wal-dir\": \"/var/lib/etcd/restored/member/wal\", \"data-dir\": \"/var/lib/etcd/restored\", \"snap-dir\": \"/var/lib/etcd/restored/member/snap\", \"initial-memory-map-size\": 10737418240}\nrestored: member kvs-cp1",
+          "seconds": 2.8
+        },
+        {
+          "where": "kvs-cp2",
+          "rc": 0,
+          "output": "member kvs-cp2 at https://10.77.0.12:2380; cluster kvs-cp1=https://10.77.0.11:2380,kvs-cp3=https://10.77.0.13:2380,kvs-cp2=https://10.77.0.12:2380\n2026-10-29T13:42:09Z\tinfo\tsnapshot/v3_snapshot.go:306\trestoring snapshot\t{\"path\": \"/var/lib/etcd/restore.db\", \"wal-dir\": \"/var/lib/etcd/restored/member/wal\", \"data-dir\": \"/var/lib/etcd/restored\", \"snap-dir\": \"/var/lib/etcd/restored/member/snap\", \"initial-memory-map-size\": 10737418240}\n2026-10-29T13:42:09Z\tinfo\tbbolt\tbackend/backend.go:213\tOpening db file (/var/lib/etcd/restored/member/snap/db) with mode -rw------- and with options: {Timeout: 0s, NoGrowSync: false, NoFreelistSync: true, PreLoadFreelist: false, FreelistType: , ReadOnly: false, MmapFlags: 8000, InitialMmapSize: 10737418240, PageSize: 0, MaxSize: 0, NoSync: false, OpenFile: 0x0, Mlock: false, Logger: 0xfa9364a6048, NoStatistics: false}\n2026-10-29T13:42:09Z\tinfo\tbbolt\tbbolt@v1.5.0/db.go:327\tOpening bbolt db (/var/lib/etcd/restored/member/snap/db) successfully\n2026-10-29T13:42:09Z\tinfo\tschema/membership.go:125\tTrimming membership information from the backend...\n2026-10-29T13:42:09Z\tinfo\tbbolt\tbackend/backend.go:213\tOpening db file (/var/lib/etcd/restored/member/snap/db) with mode -rw------- and with options: {Timeout: 0s, NoGrowSync: false, NoFreelistSync: true, PreLoadFreelist: false, FreelistType: , ReadOnly: false, MmapFlags: 8000, InitialMmapSize: 10737418240, PageSize: 0, MaxSize: 0, NoSync: false, OpenFile: 0x0, Mlock: false, Logger: 0xfa9364a6100, NoStatistics: false}\n2026-10-29T13:42:09Z\tinfo\tbbolt\tbbolt@v1.5.0/db.go:327\tOpening bbolt db (/var/lib/etcd/restored/member/snap/db) successfully\n2026-10-29T13:42:09Z\tinfo\tsnapshot/v3_snapshot.go:397\tbumping latest revision\t{\"latest-revision\": 33785, \"bump-amount\": 1000000000, \"new-latest-revision\": 1000033785}\n2026-10-29T13:42:09Z\tinfo\tsnapshot/v3_snapshot.go:414\tmarking revision compacted\t{\"revision\": 1000033785}\n2026-10-29T13:42:09Z\tinfo\tbbolt\tbackend/backend.go:213\tOpening db file (/var/lib/etcd/restored/member/snap/db) with mode -rw------- and with options: {Timeout: 0s, NoGrowSync: false, NoFreelistSync: true, PreLoadFreelist: false, FreelistType: , ReadOnly: false, MmapFlags: 8000, InitialMmapSize: 10737418240, PageSize: 0, MaxSize: 0, NoSync: false, OpenFile: 0x0, Mlock: false, Logger: 0xfa9364a61a0, NoStatistics: false}\n2026-10-29T13:42:09Z\tinfo\tbbolt\tbbolt@v1.5.0/db.go:327\tOpening bbolt db (/var/lib/etcd/restored/member/snap/db) successfully\n2026-10-29T13:42:09Z\tinfo\tmembership/cluster.go:408\tadded member\t{\"cluster-id\": \"b042fcc30528c9b4\", \"local-member-id\": \"0\", \"added-peer-id\": \"373bcc9e961d6a95\", \"added-peer-peer-urls\": [\"https://10.77.0.12:2380\"], \"added-peer-is-learner\": false}\n2026-10-29T13:42:09Z\tinfo\tmembership/cluster.go:408\tadded member\t{\"cluster-id\": \"b042fcc30528c9b4\", \"local-member-id\": \"0\", \"added-peer-id\": \"e552263647e9824c\", \"added-peer-peer-urls\": [\"https://10.77.0.13:2380\"], \"added-peer-is-learner\": false}\n2026-10-29T13:42:09Z\tinfo\tmembership/cluster.go:408\tadded member\t{\"cluster-id\": \"b042fcc30528c9b4\", \"local-member-id\": \"0\", \"added-peer-id\": \"f47aa0c9c58efe1a\", \"added-peer-peer-urls\": [\"https://10.77.0.11:2380\"], \"added-peer-is-learner\": false}\n2026-10-29T13:42:09Z\tinfo\tbbolt\tbackend/backend.go:213\tOpening db file (/var/lib/etcd/restored/member/snap/db) with mode -rw------- and with options: {Timeout: 0s, NoGrowSync: false, NoFreelistSync: true, PreLoadFreelist: false, FreelistType: , ReadOnly: false, MmapFlags: 8000, InitialMmapSize: 10737418240, PageSize: 0, MaxSize: 0, NoSync: false, OpenFile: 0x0, Mlock: false, Logger: 0xfa9363ea0a0, NoStatistics: false}\n2026-10-29T13:42:09Z\tinfo\tbbolt\tbbolt@v1.5.0/db.go:327\tOpening bbolt db (/var/lib/etcd/restored/member/snap/db) successfully\n2026-10-29T13:42:09Z\tinfo\tsnapshot/v3_snapshot.go:334\trestored snapshot\t{\"path\": \"/var/lib/etcd/restore.db\", \"wal-dir\": \"/var/lib/etcd/restored/member/wal\", \"data-dir\": \"/var/lib/etcd/restored\", \"snap-dir\": \"/var/lib/etcd/restored/member/snap\", \"initial-memory-map-size\": 10737418240}\nrestored: member kvs-cp2",
+          "seconds": 3.0
+        },
+        {
+          "where": "kvs-cp3",
+          "rc": 0,
+          "output": "member kvs-cp3 at https://10.77.0.13:2380; cluster kvs-cp1=https://10.77.0.11:2380,kvs-cp3=https://10.77.0.13:2380,kvs-cp2=https://10.77.0.12:2380\n2026-10-29T13:42:12Z\tinfo\tsnapshot/v3_snapshot.go:306\trestoring snapshot\t{\"path\": \"/var/lib/etcd/restore.db\", \"wal-dir\": \"/var/lib/etcd/restored/member/wal\", \"data-dir\": \"/var/lib/etcd/restored\", \"snap-dir\": \"/var/lib/etcd/restored/member/snap\", \"initial-memory-map-size\": 10737418240}\n2026-10-29T13:42:12Z\tinfo\tbbolt\tbackend/backend.go:213\tOpening db file (/var/lib/etcd/restored/member/snap/db) with mode -rw------- and with options: {Timeout: 0s, NoGrowSync: false, NoFreelistSync: true, PreLoadFreelist: false, FreelistType: , ReadOnly: false, MmapFlags: 8000, InitialMmapSize: 10737418240, PageSize: 0, MaxSize: 0, NoSync: false, OpenFile: 0x0, Mlock: false, Logger: 0x23ee45b2c1f8, NoStatistics: false}\n2026-10-29T13:42:12Z\tinfo\tbbolt\tbbolt@v1.5.0/db.go:327\tOpening bbolt db (/var/lib/etcd/restored/member/snap/db) successfully\n2026-10-29T13:42:12Z\tinfo\tschema/membership.go:125\tTrimming membership information from the backend...\n2026-10-29T13:42:12Z\tinfo\tbbolt\tbackend/backend.go:213\tOpening db file (/var/lib/etcd/restored/member/snap/db) with mode -rw------- and with options: {Timeout: 0s, NoGrowSync: false, NoFreelistSync: true, PreLoadFreelist: false, FreelistType: , ReadOnly: false, MmapFlags: 8000, InitialMmapSize: 10737418240, PageSize: 0, MaxSize: 0, NoSync: false, OpenFile: 0x0, Mlock: false, Logger: 0x23ee45b2c180, NoStatistics: false}\n2026-10-29T13:42:12Z\tinfo\tbbolt\tbbolt@v1.5.0/db.go:327\tOpening bbolt db (/var/lib/etcd/restored/member/snap/db) successfully\n2026-10-29T13:42:12Z\tinfo\tsnapshot/v3_snapshot.go:397\tbumping latest revision\t{\"latest-revision\": 33785, \"bump-amount\": 1000000000, \"new-latest-revision\": 1000033785}\n2026-10-29T13:42:12Z\tinfo\tsnapshot/v3_snapshot.go:414\tmarking revision compacted\t{\"revision\": 1000033785}\n2026-10-29T13:42:12Z\tinfo\tbbolt\tbackend/backend.go:213\tOpening db file (/var/lib/etcd/restored/member/snap/db) with mode -rw------- and with options: {Timeout: 0s, NoGrowSync: false, NoFreelistSync: true, PreLoadFreelist: false, FreelistType: , ReadOnly: false, MmapFlags: 8000, InitialMmapSize: 10737418240, PageSize: 0, MaxSize: 0, NoSync: false, OpenFile: 0x0, Mlock: false, Logger: 0x23ee45b2c218, NoStatistics: false}\n2026-10-29T13:42:12Z\tinfo\tbbolt\tbbolt@v1.5.0/db.go:327\tOpening bbolt db (/var/lib/etcd/restored/member/snap/db) successfully\n2026-10-29T13:42:12Z\tinfo\tmembership/cluster.go:408\tadded member\t{\"cluster-id\": \"b042fcc30528c9b4\", \"local-member-id\": \"0\", \"added-peer-id\": \"373bcc9e961d6a95\", \"added-peer-peer-urls\": [\"https://10.77.0.12:2380\"], \"added-peer-is-learner\": false}\n2026-10-29T13:42:12Z\tinfo\tmembership/cluster.go:408\tadded member\t{\"cluster-id\": \"b042fcc30528c9b4\", \"local-member-id\": \"0\", \"added-peer-id\": \"e552263647e9824c\", \"added-peer-peer-urls\": [\"https://10.77.0.13:2380\"], \"added-peer-is-learner\": false}\n2026-10-29T13:42:12Z\tinfo\tmembership/cluster.go:408\tadded member\t{\"cluster-id\": \"b042fcc30528c9b4\", \"local-member-id\": \"0\", \"added-peer-id\": \"f47aa0c9c58efe1a\", \"added-peer-peer-urls\": [\"https://10.77.0.11:2380\"], \"added-peer-is-learner\": false}\n2026-10-29T13:42:12Z\tinfo\tbbolt\tbackend/backend.go:213\tOpening db file (/var/lib/etcd/restored/member/snap/db) with mode -rw------- and with options: {Timeout: 0s, NoGrowSync: false, NoFreelistSync: true, PreLoadFreelist: false, FreelistType: , ReadOnly: false, MmapFlags: 8000, InitialMmapSize: 10737418240, PageSize: 0, MaxSize: 0, NoSync: false, OpenFile: 0x0, Mlock: false, Logger: 0x23ee45c00120, NoStatistics: false}\n2026-10-29T13:42:12Z\tinfo\tbbolt\tbbolt@v1.5.0/db.go:327\tOpening bbolt db (/var/lib/etcd/restored/member/snap/db) successfully\n2026-10-29T13:42:12Z\tinfo\tsnapshot/v3_snapshot.go:334\trestored snapshot\t{\"path\": \"/var/lib/etcd/restore.db\", \"wal-dir\": \"/var/lib/etcd/restored/member/wal\", \"data-dir\": \"/var/lib/etcd/restored\", \"snap-dir\": \"/var/lib/etcd/restored/member/snap\", \"initial-memory-map-size\": 10737418240}\nrestored: member kvs-cp3",
+          "seconds": 2.9
+        }
+      ],
+      "ran_at": "2026-10-29T13:42:05Z"
+    },
+    "restore-stop": {
+      "section": "etcd-restore",
+      "target": {
+        "on": "node",
+        "node": "each"
+      },
+      "cmd": "sudo install -d -m 700 /etc/kubernetes/restore-stopped\nfor m in kube-apiserver kube-controller-manager kube-scheduler etcd; do sudo mv /etc/kubernetes/manifests/$m.yaml /etc/kubernetes/restore-stopped/; done\nfor i in $(seq 1 60); do [ -z \"$(sudo crictl ps -q --name '^(etcd|kube-apiserver|kube-controller-manager|kube-scheduler)$')\" ] && break; sleep 5; done\n[ -z \"$(sudo crictl ps -q --name '^(etcd|kube-apiserver|kube-controller-manager|kube-scheduler)$')\" ] && echo \"control plane stopped\"",
+      "group": "destructive",
+      "expect": "control plane stopped",
+      "components": [],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "kvs-cp1",
+          "rc": 0,
+          "output": "control plane stopped",
+          "seconds": 32.3
+        },
+        {
+          "where": "kvs-cp2",
+          "rc": 0,
+          "output": "control plane stopped",
+          "seconds": 33.9
+        },
+        {
+          "where": "kvs-cp3",
+          "rc": 0,
+          "output": "control plane stopped",
+          "seconds": 33.3
+        }
+      ],
+      "ran_at": "2026-10-29T13:42:14Z"
+    },
+    "restore-swap": {
+      "section": "etcd-restore",
+      "target": {
+        "on": "node",
+        "node": "each"
+      },
+      "cmd": "sudo test -d /var/lib/etcd/restored/member || { echo \"no restored data directory: nothing swapped\"; exit 1; }\nold=/var/lib/etcd-pre-restore-$(date -u +%Y%m%dT%H%M%SZ)\nsudo install -d -m 700 \"$old\"\nsudo mv /var/lib/etcd/member \"$old/\"\nsudo mv /var/lib/etcd/restored/member /var/lib/etcd/member\nsudo rmdir /var/lib/etcd/restored\nsudo rm -f /var/lib/etcd/restore.db\nsudo ls -ld /var/lib/etcd/member \"$old/member\" && echo \"data directory: restored\"",
+      "group": "destructive",
+      "expect": "data directory: restored",
+      "components": [],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "kvs-cp1",
+          "rc": 0,
+          "output": "drwx------ 4 root root 4096 Oct 29 11:17 /var/lib/etcd-pre-restore-20261029T134355Z/member\ndrwx------ 4 root root 4096 Oct 29 13:42 /var/lib/etcd/member\ndata directory: restored",
+          "seconds": 3.2
+        },
+        {
+          "where": "kvs-cp2",
+          "rc": 0,
+          "output": "drwx------ 4 root root 4096 Oct 29 11:09 /var/lib/etcd-pre-restore-20261029T134357Z/member\ndrwx------ 4 root root 4096 Oct 29 13:42 /var/lib/etcd/member\ndata directory: restored",
+          "seconds": 2.7
+        },
+        {
+          "where": "kvs-cp3",
+          "rc": 0,
+          "output": "drwx------ 4 root root 4096 Oct 29 11:11 /var/lib/etcd-pre-restore-20261029T134359Z/member\ndrwx------ 4 root root 4096 Oct 29 13:42 /var/lib/etcd/member\ndata directory: restored",
+          "seconds": 1.7
+        }
+      ],
+      "ran_at": "2026-10-29T13:43:53Z"
+    },
+    "restore-start-etcd": {
+      "section": "etcd-restore",
+      "target": {
+        "on": "node",
+        "node": "each"
+      },
+      "cmd": "sudo mv /etc/kubernetes/restore-stopped/etcd.yaml /etc/kubernetes/manifests/ && echo \"etcd manifest back\"",
+      "group": "destructive",
+      "expect": "etcd manifest back",
+      "components": [],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "kvs-cp1",
+          "rc": 0,
+          "output": "etcd manifest back",
+          "seconds": 1.6
+        },
+        {
+          "where": "kvs-cp2",
+          "rc": 0,
+          "output": "etcd manifest back",
+          "seconds": 1.4
+        },
+        {
+          "where": "kvs-cp3",
+          "rc": 0,
+          "output": "etcd manifest back",
+          "seconds": 1.3
+        }
+      ],
+      "ran_at": "2026-10-29T13:44:01Z"
+    },
+    "restore-etcd-health": {
+      "section": "etcd-restore",
+      "target": {
+        "on": "node",
+        "node": "any"
+      },
+      "cmd": "C=\"--endpoints=https://127.0.0.1:2379 --cacert /etc/kubernetes/pki/etcd/ca.crt --cert /etc/kubernetes/pki/etcd/server.crt --key /etc/kubernetes/pki/etcd/server.key\"\nfor i in $(seq 1 120); do\n  ETCD=$(sudo crictl ps -q --name '^etcd$' | head -n 1)\n  [ -n \"$ETCD\" ] && sudo crictl exec \"$ETCD\" etcdctl $C endpoint health --cluster >/dev/null 2>&1 && break\n  sleep 5\ndone\nsudo crictl exec \"$ETCD\" etcdctl $C member list -w table\nsudo crictl exec \"$ETCD\" etcdctl $C endpoint health --cluster -w table",
+      "group": "destructive",
+      "expect": "started",
+      "components": [],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "kvs-cp1",
+          "rc": 0,
+          "output": "\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502        ID        \u2502 STATUS  \u2502  NAME   \u2502       PEER ADDRS        \u2502      CLIENT ADDRS       \u2502 IS LEARNER \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 373bcc9e961d6a95 \u2502 started \u2502 kvs-cp2 \u2502 https://10.77.0.12:2380 \u2502 https://10.77.0.12:2379 \u2502      false \u2502\n\u2502 e552263647e9824c \u2502 started \u2502 kvs-cp3 \u2502 https://10.77.0.13:2380 \u2502 https://10.77.0.13:2379 \u2502      false \u2502\n\u2502 f47aa0c9c58efe1a \u2502 started \u2502 kvs-cp1 \u2502 https://10.77.0.11:2380 \u2502 https://10.77.0.11:2379 \u2502      false \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502        ENDPOINT         \u2502 HEALTH \u2502    TOOK     \u2502 ERROR \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 https://10.77.0.11:2379 \u2502   true \u2502 24.909651ms \u2502       \u2502\n\u2502 https://10.77.0.12:2379 \u2502   true \u2502 36.703051ms \u2502       \u2502\n\u2502 https://10.77.0.13:2379 \u2502   true \u2502 50.017505ms \u2502       \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518",
+          "seconds": 2.3
+        }
+      ],
+      "ran_at": "2026-10-29T13:44:05Z"
+    },
+    "restore-start-cp": {
+      "section": "etcd-restore",
+      "target": {
+        "on": "node",
+        "node": "each"
+      },
+      "cmd": "for m in kube-apiserver kube-controller-manager kube-scheduler; do sudo mv /etc/kubernetes/restore-stopped/$m.yaml /etc/kubernetes/manifests/; done\nsudo rmdir /etc/kubernetes/restore-stopped\nsudo systemctl restart kubelet\necho \"control plane back\"",
+      "group": "destructive",
+      "expect": "control plane back",
+      "components": [],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "kvs-cp1",
+          "rc": 0,
+          "output": "control plane back",
+          "seconds": 1.7
+        },
+        {
+          "where": "kvs-cp2",
+          "rc": 0,
+          "output": "control plane back",
+          "seconds": 1.6
+        },
+        {
+          "where": "kvs-cp3",
+          "rc": 0,
+          "output": "control plane back",
+          "seconds": 1.4
+        }
+      ],
+      "ran_at": "2026-10-29T13:44:07Z"
+    },
+    "restore-api": {
+      "section": "etcd-restore",
+      "target": {
+        "on": "admin"
+      },
+      "cmd": "for i in $(seq 1 120); do kubectl get --raw=/readyz >/dev/null 2>&1 && break; sleep 5; done\nkubectl get --raw=/readyz; echo\nkubectl wait --for=condition=Ready node --all --timeout=600s\nkubectl get nodes",
+      "group": "destructive",
+      "expect": "^ok$",
+      "components": [],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "admin",
+          "rc": 0,
+          "output": "ok\nnode/kvs-cp1 condition met\nnode/kvs-cp2 condition met\nnode/kvs-cp3 condition met\nNAME      STATUS   ROLES           AGE    VERSION\nkvs-cp1   Ready    control-plane   156m   v1.36.6\nkvs-cp2   Ready    control-plane   154m   v1.36.6\nkvs-cp3   Ready    control-plane   152m   v1.36.6",
+          "seconds": 18.0
+        }
+      ],
+      "ran_at": "2026-10-29T13:44:12Z"
+    },
+    "restore-proof": {
+      "section": "etcd-restore",
+      "target": {
+        "on": "admin"
+      },
+      "cmd": "kubectl get configmap kf-restore-before -o jsonpath='{.metadata.name}: written {.data.at}{\"\\n\"}'\nif kubectl get configmap kf-restore-after >/dev/null 2>&1; then echo \"kf-restore-after: present, the restore did not take\"; exit 1; fi\necho \"kf-restore-after: absent (written after the snapshot)\"\nfor i in $(seq 1 120); do\n  p=$(kubectl get vmi -A -o jsonpath='{.items[*].status.phase}')\n  [ -n \"$p\" ] && [ -z \"$(echo \"$p\" | tr ' ' '\\n' | grep -vx Running)\" ] && break; sleep 5\ndone\nkubectl get vmi -A\n[ -n \"$p\" ] && [ -z \"$(echo \"$p\" | tr ' ' '\\n' | grep -vx Running)\" ] && echo \"virtual machines: all Running\"",
+      "group": "destructive",
+      "expect": "virtual machines: all Running",
+      "components": [],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "admin",
+          "rc": 0,
+          "output": "kf-restore-before: written 2026-10-29T13:41:47Z\nkf-restore-after: absent (written after the snapshot)\nNAMESPACE   NAME         AGE    PHASE     IP           NODENAME   READY\ndefault     kvs-cirros   118m   Running   10.244.1.9   kvs-cp2    True\nvirtual machines: all Running",
+          "seconds": 1.4
+        }
+      ],
+      "ran_at": "2026-10-29T13:44:30Z"
+    },
+    "cert-expiration": {
+      "section": "certificates",
+      "target": {
+        "on": "node",
+        "node": "each"
+      },
+      "cmd": "sudo kubeadm certs check-expiration",
+      "group": "read",
+      "expect": "CERTIFICATE AUTHORITY",
+      "components": [
+        "kubeapiserver",
+        "kubecontrollermanager",
+        "kubescheduler"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "kvs-cp1",
+          "rc": 0,
+          "output": "[check-expiration] Reading configuration from the \"kubeadm-config\" ConfigMap in namespace \"kube-system\"...\n[check-expiration] Use 'kubeadm init phase upload-config kubeadm --config your-config-file' to re-upload it.\n\nCERTIFICATE                EXPIRES                  RESIDUAL TIME   CERTIFICATE AUTHORITY   EXTERNALLY MANAGED\nadmin.conf                 Oct 29, 2027 01:23 UTC   364d            ca                      no      \napiserver                  Oct 29, 2027 01:23 UTC   364d            ca                      no      \napiserver-etcd-client      Oct 29, 2027 01:23 UTC   364d            etcd-ca                 no      \napiserver-kubelet-client   Oct 29, 2027 01:23 UTC   364d            ca                      no      \ncontroller-manager.conf    Oct 29, 2027 01:23 UTC   364d            ca                      no      \netcd-healthcheck-client    Oct 29, 2027 01:23 UTC   364d            etcd-ca                 no      \netcd-peer                  Oct 29, 2027 01:23 UTC   364d            etcd-ca                 no      \netcd-server                Oct 29, 2027 01:23 UTC   364d            etcd-ca                 no      \nfront-proxy-client         Oct 29, 2027 01:23 UTC   364d            front-proxy-ca          no      \nscheduler.conf             Oct 29, 2027 01:23 UTC   364d            ca                      no      \nsuper-admin.conf           Oct 29, 2027 01:23 UTC   364d            ca                      no      \n\nCERTIFICATE AUTHORITY   EXPIRES                  RESIDUAL TIME   EXTERNALLY MANAGED\nca                      Oct 26, 2036 01:23 UTC   9y              no      \netcd-ca                 Oct 26, 2036 01:23 UTC   9y              no      \nfront-proxy-ca          Oct 26, 2036 01:23 UTC   9y              no      ",
+          "seconds": 1.7
+        },
+        {
+          "where": "kvs-cp2",
+          "rc": 0,
+          "output": "[check-expiration] Reading configuration from the \"kubeadm-config\" ConfigMap in namespace \"kube-system\"...\n[check-expiration] Use 'kubeadm init phase upload-config kubeadm --config your-config-file' to re-upload it.\n\nCERTIFICATE                  EXPIRES                  RESIDUAL TIME   CERTIFICATE AUTHORITY   EXTERNALLY MANAGED\nadmin.conf                   Oct 29, 2027 01:24 UTC   364d            ca                      no      \napiserver                    Oct 29, 2027 01:24 UTC   364d            ca                      no      \napiserver-etcd-client        Oct 29, 2027 01:24 UTC   364d            etcd-ca                 no      \napiserver-kubelet-client     Oct 29, 2027 01:24 UTC   364d            ca                      no      \ncontroller-manager.conf      Oct 29, 2027 01:24 UTC   364d            ca                      no      \netcd-healthcheck-client      Oct 29, 2027 01:24 UTC   364d            etcd-ca                 no      \netcd-peer                    Oct 29, 2027 01:24 UTC   364d            etcd-ca                 no      \netcd-server                  Oct 29, 2027 01:24 UTC   364d            etcd-ca                 no      \nfront-proxy-client           Oct 29, 2027 01:24 UTC   364d            front-proxy-ca          no      \nscheduler.conf               Oct 29, 2027 01:24 UTC   364d            ca                      no      \n!MISSING! super-admin.conf                                                                    \n\nCERTIFICATE AUTHORITY   EXPIRES                  RESIDUAL TIME   EXTERNALLY MANAGED\nca                      Oct 26, 2036 01:23 UTC   9y              no      \netcd-ca                 Oct 26, 2036 01:23 UTC   9y              no      \nfront-proxy-ca          Oct 26, 2036 01:23 UTC   9y              no      ",
+          "seconds": 2.2
+        },
+        {
+          "where": "kvs-cp3",
+          "rc": 0,
+          "output": "[check-expiration] Reading configuration from the \"kubeadm-config\" ConfigMap in namespace \"kube-system\"...\n[check-expiration] Use 'kubeadm init phase upload-config kubeadm --config your-config-file' to re-upload it.\n\nCERTIFICATE                  EXPIRES                  RESIDUAL TIME   CERTIFICATE AUTHORITY   EXTERNALLY MANAGED\nadmin.conf                   Oct 29, 2027 01:25 UTC   364d            ca                      no      \napiserver                    Oct 29, 2027 01:25 UTC   364d            ca                      no      \napiserver-etcd-client        Oct 29, 2027 01:25 UTC   364d            etcd-ca                 no      \napiserver-kubelet-client     Oct 29, 2027 01:25 UTC   364d            ca                      no      \ncontroller-manager.conf      Oct 29, 2027 01:25 UTC   364d            ca                      no      \netcd-healthcheck-client      Oct 29, 2027 01:25 UTC   364d            etcd-ca                 no      \netcd-peer                    Oct 29, 2027 01:25 UTC   364d            etcd-ca                 no      \netcd-server                  Oct 29, 2027 01:25 UTC   364d            etcd-ca                 no      \nfront-proxy-client           Oct 29, 2027 01:25 UTC   364d            front-proxy-ca          no      \nscheduler.conf               Oct 29, 2027 01:25 UTC   364d            ca                      no      \n!MISSING! super-admin.conf                                                                    \n\nCERTIFICATE AUTHORITY   EXPIRES                  RESIDUAL TIME   EXTERNALLY MANAGED\nca                      Oct 26, 2036 01:23 UTC   9y              no      \netcd-ca                 Oct 26, 2036 01:23 UTC   9y              no      \nfront-proxy-ca          Oct 26, 2036 01:23 UTC   9y              no      ",
+          "seconds": 2.7
+        }
+      ],
+      "ran_at": "2026-10-29T02:37:17Z"
+    },
+    "kubelet-rotation": {
+      "section": "certificates",
+      "target": {
+        "on": "node",
+        "node": "any"
+      },
+      "cmd": "sudo grep -E '^(rotateCertificates|serverTLSBootstrap):' /var/lib/kubelet/config.yaml",
+      "group": "read",
+      "expect": "rotateCertificates: true",
+      "components": [
+        "kubernetesnode"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "kvs-cp1",
+          "rc": 0,
+          "output": "rotateCertificates: true",
+          "seconds": 1.5
+        }
+      ],
+      "ran_at": "2026-10-29T02:37:24Z"
+    },
+    "cert-renew": {
+      "section": "cert-renewal",
+      "target": {
+        "on": "node",
+        "node": "last"
+      },
+      "cmd": "ip=$(sudo sed -n 's/.*--advertise-address=//p' /etc/kubernetes/manifests/kube-apiserver.yaml)\nsudo kubeadm certs renew all\nfor m in kube-apiserver kube-controller-manager kube-scheduler etcd; do sudo mv /etc/kubernetes/manifests/$m.yaml /etc/kubernetes/$m.yaml.renew; done\nsleep 30\nfor m in kube-apiserver kube-controller-manager kube-scheduler etcd; do sudo mv /etc/kubernetes/$m.yaml.renew /etc/kubernetes/manifests/$m.yaml; done\nready=\nfor i in $(seq 1 60); do sudo kubectl --kubeconfig /etc/kubernetes/admin.conf --server \"https://$ip:6443\" get --raw=/readyz >/dev/null 2>&1 && { ready=1; break; }; sleep 5; done\n[ -n \"$ready\" ] || { echo \"API server on $ip not ready after the restart\"; exit 1; }\necho \"API server on $ip ready\"\nsudo kubeadm certs check-expiration | head -n 12",
+      "group": "disruptive",
+      "expect": "API server on .* ready",
+      "components": [
+        "kubeapiserver",
+        "kubecontrollermanager",
+        "kubescheduler"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "kvs-cp3",
+          "rc": 0,
+          "output": "[renew] Reading configuration from the \"kubeadm-config\" ConfigMap in namespace \"kube-system\"...\n[renew] Use 'kubeadm init phase upload-config kubeadm --config your-config-file' to re-upload it.\n\ncertificate embedded in the kubeconfig file for the admin to use and for kubeadm itself renewed\ncertificate for serving the Kubernetes API renewed\ncertificate the apiserver uses to access etcd renewed\ncertificate for the API server to connect to kubelet renewed\ncertificate embedded in the kubeconfig file for the controller manager to use renewed\ncertificate for liveness probes to healthcheck etcd renewed\ncertificate for etcd nodes to communicate with each other renewed\ncertificate for serving etcd renewed\ncertificate for the front proxy client renewed\ncertificate embedded in the kubeconfig file for the scheduler manager to use renewed\nMISSING! certificate embedded in the kubeconfig file for the super-admin\n\nDone renewing certificates. You must restart the kube-apiserver, kube-controller-manager, kube-scheduler and etcd, so that they can use the new certificates.\nAPI server on 10.77.0.13 ready\n[check-expiration] Reading configuration from the \"kubeadm-config\" ConfigMap in namespace \"kube-system\"...\n[check-expiration] Use 'kubeadm init phase upload-config kubeadm --config your-config-file' to re-upload it.\n\nCERTIFICATE                  EXPIRES                  RESIDUAL TIME   CERTIFICATE AUTHORITY   EXTERNALLY MANAGED\nadmin.conf                   Oct 29, 2027 02:37 UTC   364d            ca                      no      \napiserver                    Oct 29, 2027 02:37 UTC   364d            ca                      no      \napiserver-etcd-client        Oct 29, 2027 02:37 UTC   364d            etcd-ca                 no      \napiserver-kubelet-client     Oct 29, 2027 02:37 UTC   364d            ca                      no      \ncontroller-manager.conf      Oct 29, 2027 02:37 UTC   364d            ca                      no      \netcd-healthcheck-client      Oct 29, 2027 02:37 UTC   364d            etcd-ca                 no      \netcd-peer                    Oct 29, 2027 02:37 UTC   364d            etcd-ca                 no      \netcd-server                  Oct 29, 2027 02:37 UTC   364d            etcd-ca                 no      ",
+          "seconds": 50.9
+        }
+      ],
+      "ran_at": "2026-10-29T02:37:25Z"
+    },
+    "cert-renew-health": {
+      "section": "cert-renewal",
+      "target": {
+        "on": "admin"
+      },
+      "cmd": "kubectl wait --for=condition=Ready node --all --timeout=600s\nkubectl get nodes\nkubectl get vmi -A\np=$(kubectl get vmi -A -o jsonpath='{.items[*].status.phase}')\n[ -n \"$p\" ] && [ -z \"$(echo \"$p\" | tr ' ' '\\n' | grep -vx Running)\" ] && echo \"virtual machines: all Running\"",
+      "group": "disruptive",
+      "expect": "virtual machines: all Running",
+      "components": [
+        "kubeapiserver",
+        "kubecontrollermanager",
+        "kubescheduler"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "admin",
+          "rc": 0,
+          "output": "node/kvs-cp1 condition met\nnode/kvs-cp2 condition met\nnode/kvs-cp3 condition met\nNAME      STATUS   ROLES           AGE   VERSION\nkvs-cp1   Ready    control-plane   74m   v1.36.6\nkvs-cp2   Ready    control-plane   72m   v1.36.6\nkvs-cp3   Ready    control-plane   71m   v1.36.6\nNAMESPACE   NAME         AGE   PHASE     IP           NODENAME   READY\ndefault     kvs-cirros   59m   Running   10.244.1.9   kvs-cp2    True\nvirtual machines: all Running",
+          "seconds": 1.8
+        }
+      ],
+      "ran_at": "2026-10-29T02:38:16Z"
+    },
+    "upgrade-plan": {
+      "section": "upgrades",
+      "target": {
+        "on": "node",
+        "node": "any"
+      },
+      "cmd": "sudo kubeadm upgrade plan \"$(kubeadm version -o short)\"",
+      "group": "read",
+      "expect": "kubeadm",
+      "components": [
+        "kubeapiserver",
+        "kubecontrollermanager",
+        "kubescheduler"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "kvs-cp1",
+          "rc": 0,
+          "output": "[preflight] Running pre-flight checks.\n[upgrade/config] Reading configuration from the \"kubeadm-config\" ConfigMap in namespace \"kube-system\"...\n[upgrade/config] Use 'kubeadm init phase upload-config kubeadm --config your-config-file' to re-upload it.\n[upgrade] Running cluster health checks\n[upgrade] Fetching available versions to upgrade to\n[upgrade/versions] Cluster version: 1.36.6\n[upgrade/versions] kubeadm version: v1.36.6\n[upgrade/versions] Target version: v1.36.6\n[upgrade/versions] Latest version in the v1.36 series: v1.36.6",
+          "seconds": 10.2
+        }
+      ],
+      "ran_at": "2026-10-29T02:38:18Z"
+    },
+    "upgrade-dry-run": {
+      "section": "upgrades",
+      "target": {
+        "on": "node",
+        "node": "any"
+      },
+      "cmd": "set -o pipefail\nsudo kubeadm upgrade apply --config /root/kubeadm-config.yaml --dry-run --yes 2>&1 | tail -n 40",
+      "group": "read",
+      "expect": "dry",
+      "components": [
+        "kubeapiserver",
+        "kubecontrollermanager",
+        "kubescheduler",
+        "kubeproxy"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "kvs-cp1",
+          "rc": 0,
+          "output": "metadata:\n  name: system:coredns\nrules:\n- apiGroups:\n  - \"\"\n  resources:\n  - endpoints\n  - services\n  - pods\n  - namespaces\n  verbs:\n  - list\n  - watch\n- apiGroups:\n  - discovery.k8s.io\n  resources:\n  - endpointslices\n  verbs:\n  - list\n  - watch\n---\napiVersion: rbac.authorization.k8s.io/v1\nkind: ClusterRoleBinding\nmetadata:\n  name: system:coredns\nroleRef:\n  apiGroup: rbac.authorization.k8s.io\n  kind: ClusterRole\n  name: system:coredns\nsubjects:\n- kind: ServiceAccount\n  name: coredns\n  namespace: kube-system\n---\napiVersion: v1\nkind: ServiceAccount\nmetadata:\n  name: coredns\n  namespace: kube-system\n[upgrade/successful] Finished dryrunning successfully!",
+          "seconds": 3.0
+        }
+      ],
+      "ran_at": "2026-10-29T02:38:28Z"
+    },
+    "containerd-deprecations": {
+      "section": "registry-credential",
+      "target": {
+        "on": "node",
+        "node": "any"
+      },
+      "cmd": "sudo ctr deprecations list",
+      "group": "read",
+      "expect": "",
+      "components": [
+        "kubernetesnode"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "kvs-cp1",
+          "rc": 0,
+          "output": "ID                                                LAST OCCURRENCE                   MESSAGE    \nio.containerd.deprecation/cri-registry-configs    2026-10-29T01:31:21.202454799Z    The `configs` property of `[plugins.\"io.containerd.grpc.v1.cri\".registry]` is deprecated since containerd v1.5 and will be removed in containerd v2.4. Use `config_path` instead.",
+          "seconds": 1.4
+        }
+      ],
+      "ran_at": "2026-10-29T02:38:31Z"
+    },
+    "containerd-config-sections": {
+      "section": "registry-credential",
+      "target": {
+        "on": "node",
+        "node": "any"
+      },
+      "cmd": "sudo grep -nE '^\\s*\\[' /etc/containerd/config.toml",
+      "group": "read",
+      "expect": "registry",
+      "components": [
+        "kubernetesnode"
+      ],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "kvs-cp1",
+          "rc": 0,
+          "output": "9:[plugins.'io.containerd.cri.v1.images']\n10:  [plugins.'io.containerd.cri.v1.images'.pinned_images]\n13:  [plugins.'io.containerd.cri.v1.images'.registry]\n18:[plugins.'io.containerd.cri.v1.runtime'.containerd.runtimes.runc]\n20:  [plugins.'io.containerd.cri.v1.runtime'.containerd.runtimes.runc.options]\n33:[plugins.'io.containerd.cri.v1.images'.registry.configs.'10.77.0.1:5000'.auth]",
+          "seconds": 1.3
+        }
+      ],
+      "ran_at": "2026-10-29T02:38:33Z"
+    },
+    "unhealthy-pods": {
+      "section": "troubleshooting",
+      "target": {
+        "on": "admin"
+      },
+      "cmd": "kubectl get pods -A --field-selector=status.phase!=Running,status.phase!=Succeeded -o wide",
+      "group": "read",
+      "expect": "",
+      "components": [],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "admin",
+          "rc": 0,
+          "output": "No resources found",
+          "seconds": 1.0
+        }
+      ],
+      "ran_at": "2026-10-29T02:38:34Z"
+    },
+    "recent-warnings": {
+      "section": "troubleshooting",
+      "target": {
+        "on": "admin"
+      },
+      "cmd": "kubectl get events -A --field-selector type=Warning --sort-by=.lastTimestamp | tail -n 20",
+      "group": "read",
+      "expect": "",
+      "components": [],
+      "ran": true,
+      "passed": true,
+      "results": [
+        {
+          "where": "admin",
+          "rc": 0,
+          "output": "NAMESPACE     LAST SEEN   TYPE      REASON                   OBJECT                         MESSAGE\nkubevirt      61m         Warning   FailedCreatePodSandBox   pod/virt-api-b7d659dff-n7dgk   Failed to create pod sandbox: rpc error: code = Unknown desc = failed to setup network for sandbox \"a536d44922f0f2852c6be250065726ef19131fae3a6ed1c397c821524d206821\": plugin type=\"multus\" failed (add): Multus: [kubevirt/virt-api-b7d659dff-n7dgk/d908378d-aebe-4ffa-a91b-a68ace7c26ce]: error waiting for pod: Get \"https://10.96.0.1:443/api/v1/namespaces/kubevirt/pods/virt-api-b7d659dff-n7dgk?timeout=1m0s\": context deadline exceeded\nkube-system   66s         Warning   Unhealthy                pod/kube-scheduler-kvs-cp3     Readiness probe failed: Get \"https://127.0.0.1:10259/readyz\": dial tcp 127.0.0.1:10259: connect: connection refused\nkube-system   65s         Warning   Unhealthy                pod/kube-apiserver-kvs-cp3     Readiness probe failed: HTTP probe failed with statuscode: 500",
+          "seconds": 1.0
+        }
+      ],
+      "ran_at": "2026-10-29T02:38:35Z"
+    }
+  },
+  "evidence_files": {
+    "product-kits/kubevirt-stack/test/evidence/2026-10-29/acceptance/stack-image-extract.txt": {
+      "sha256": "12dd8e4bff0e2043795d840da8ce6d631567edd36af94539f6ce34b8182a728f",
+      "found": true
+    },
+    "product-kits/kubevirt-stack/test/integration.sh": {
+      "sha256": "8d0dff1a880e58f66839f315bba978a9ce1d8e55cfe2a6780a5fc88abe1ff8b1",
+      "found": true
+    },
+    "product-kits/kubevirt-stack/test/evidence/2026-10-29/run2/mirror.txt": {
+      "sha256": "66c07e0694303ff7f608ebbf950399904d67c42c4f3f67f5fb522fcdde835441",
+      "found": true
+    },
+    "product-kits/kubevirt-stack/test/evidence/2026-10-29/run2/signatures.txt": {
+      "sha256": "65bdb2b304a28c6c86cd5dcd233a6bf54d4a622048e218e2e6139e4a272f81b8",
+      "found": true
+    },
+    "product-kits/kubevirt-stack/test/evidence/2026-10-29/run2/install-node-cp1.txt": {
+      "sha256": "2945c820b07e7313bb18a15e51b01cc12677fe72fecbcef96c798892e5e17f0b",
+      "found": true
+    },
+    "product-kits/kubevirt-stack/test/evidence/2026-10-29/run2/run2.log": {
+      "sha256": "ac50d7956a3ee7efc4c204ff8ddc3cac36c611eea2a123d8f3c40370f5845a82",
+      "found": true
+    },
+    "product-kits/kubevirt-stack/test/evidence/2026-10-29/run2/kubeadm-images-pull.txt": {
+      "sha256": "fb5602d763e198d76e3239991c8649acb327a14a1bff1db30f5f283a9bdccfa9",
+      "found": true
+    },
+    "product-kits/kubevirt-stack/test/evidence/2026-10-29/run2/kubeadm-init.txt": {
+      "sha256": "5406d2542b705e8f4f7790396b374c5e5ee5e3565178a545c87997778fbfb901",
+      "found": true
+    },
+    "product-kits/kubevirt-stack/test/evidence/2026-10-29/run2/kubeadm-join-cp2.txt": {
+      "sha256": "5341571f09408a84e5290a544b837411188bd172d416eac40df8de9d41396e07",
+      "found": true
+    },
+    "product-kits/kubevirt-stack/test/evidence/2026-10-29/run2/addons.txt": {
+      "sha256": "a1c7ff3e5fe9e146364e285782b1eb1c21c4a3e3974d1c44b7198379b64846d6",
+      "found": true
+    },
+    "product-kits/kubevirt-stack/test/evidence/2026-10-29/run2/bridge-cp1.txt": {
+      "sha256": "e3f628587375935362fca4d4b4f7191deb3553bd089fb4375a070435708e17a4",
+      "found": true
+    },
+    "product-kits/kubevirt-stack/test/evidence/2026-10-29/run2/mirror-kubevirt.txt": {
+      "sha256": "4619a2a5d266b1fbacb4222bdd7679db913d5ed403cb3e3e30b676849319b78a",
+      "found": true
+    },
+    "product-kits/kubevirt-stack/test/evidence/2026-10-29/run2/kubevirt-apply.txt": {
+      "sha256": "55d224e76fb2f4cdb7a7330b8ba3dc036ec23e9ff6b048a2cb4e2a5ce3248171",
+      "found": true
+    },
+    "product-kits/kubevirt-stack/test/evidence/2026-10-29/run2/vm-disk.txt": {
+      "sha256": "5646d46bec689fe4f30ac95cc69cbd006eb24fd674dd993df33c51a4f5e03333",
+      "found": true
+    },
+    "product-kits/kubevirt-stack/install/node/registry.env.example": {
+      "sha256": "260ebb0afd7263a5f61878d59f41e66a2f485aec7e359fb59334f5d55f713ab6",
+      "found": true
+    },
+    "product-kits/kubevirt-stack/install/controlplane/kubeadm-config.yaml": {
+      "sha256": "84dd53510f72de6d81cd6fa22b62fb87be5fbeb293bf52b8e19f9dcb76361fba",
+      "found": true
+    },
+    "product-kits/kubevirt-stack/install/controlplane/patches/kube-apiserver+strategic.yaml": {
+      "sha256": "efe651b17f375ebf8910a85584c2810042a624e59f74b2d5fb9db4983e2864d4",
+      "found": true
+    },
+    "product-kits/kubevirt-stack/install/network/bridge-netplan.example.yaml": {
+      "sha256": "d4c6b6c95660dd86c7b279139abd1e9244bd43fff50463c1c72252a0b333a649",
+      "found": true
+    },
+    "product-kits/kubevirt-stack/install/network/nad-host-bridge.yaml": {
+      "sha256": "f91c5bfcdbf2e06862d6bc4fe866bcee3bbc14720e4beef758a79a2c63770ccb",
+      "found": true
+    },
+    "product-kits/kubevirt-stack/install/kubevirt/kubevirt-cr.yaml": {
+      "sha256": "eebbe6707b8f4cbed69afb9a9264d65612b833e9837978df8fe5abb1c2918ead",
+      "found": true
+    },
+    "product-kits/kubevirt-stack/install/vm/local-disk-vm.yaml": {
+      "sha256": "fa67562ed6e1273f8ce88494da91ebe63825ea99145e158c29be305ad865520f",
+      "found": true
+    },
+    "product-kits/kubevirt-stack/test/INTEGRATION_REPORT.md": {
+      "sha256": "bb773830ce9ac3e9591a24d662644904203998d462d56ce7c5256e0cde59103f",
+      "found": true
+    },
+    "product-kits/kubevirt-stack/install/README.md": {
+      "sha256": "0abe19a8a9b95ced524a06880c5acbd89980790f7856bd6c612f63b06390e047",
+      "found": true
+    },
+    "product-kits/kubevirt-stack/test/evidence/2026-10-29/run2/RESULTS": {
+      "sha256": "90d3e232d12ba45064b40726b374bff07dd58eb750cfa33bd57f49cb43813e12",
+      "found": true
+    },
+    "product-kits/kubevirt-stack/install/node/install-node.sh": {
+      "sha256": "25f77a539661d972786998d96e59094269b2e01e5cd6aa7c205574bb5d3a9659",
+      "found": true
+    },
+    "product-kits/kubevirt-stack/install/network/kube-vip-static-pod.sh": {
+      "sha256": "cdbea5a4f9038c4c06a154be09b309383669740a65b44f2e0100f9a3827d83fc",
+      "found": true
+    },
+    "product-kits/kubevirt-stack/test/evidence/2026-10-29/run2/kube-vip-after-init.txt": {
+      "sha256": "bc10e052ac0d857ee5aaaab6854ccdec02ca99eab837c129742042a6b1bf0030",
+      "found": true
+    },
+    "product-kits/kubevirt-stack/test/evidence/2026-10-29/run2/failover.txt": {
+      "sha256": "997f8841ebf628142a7a834d45b30ec75979496a6212ac69db68fcddee3a0116",
+      "found": true
+    },
+    "product-kits/kubevirt-stack/test/evidence/2026-10-29/run2/pod-network.txt": {
+      "sha256": "7f1862cc4567b49ffec5462302b54f7f21ad7f56072bfc61f2dc6b24b427711d",
+      "found": true
+    },
+    "product-kits/kubevirt-stack/test/evidence/2026-10-29/run2/coredns-spread.txt": {
+      "sha256": "1e942b40412939b096c8a2bbff6938b256c24b53d9e61ba3351bbbff315bee6d",
+      "found": true
+    },
+    "product-kits/kubevirt-stack/install/kubevirt/README.md": {
+      "sha256": "f6d8499e9bfe6c6e44cd85e9ed75895b011c40c752bdbf8e159b02cc040ab7b9",
+      "found": true
+    },
+    "product-kits/kubevirt-stack/test/evidence/2026-10-29/run2/vm-running-kvm.txt": {
+      "sha256": "609c0ff0b9b918e6691f15c2f66cea0f585ffcd337f9c91d60b0ebfc04b3ed21",
+      "found": true
+    },
+    "product-kits/kubevirt-stack/test/evidence/2026-10-29/run2/vm-console.txt": {
+      "sha256": "40683c133fe0a8df944157af3f5deb82be41679dc9b0565781746c002c4489d2",
+      "found": true
+    },
+    "product-kits/kubevirt-stack/test/evidence/2026-10-29/run2/vm-bridge-ip.txt": {
+      "sha256": "68b9b3a33201a91fc108b06898b3f2891f1835025c9010570879d64dc3622d98",
+      "found": true
+    },
+    "registry/stacks/kubevirt-stack.json": {
+      "sha256": "82136f8160036d549b6a705b74f4acfff627c1beacc1e986b7c623104eeb031e",
+      "found": true
+    },
+    "docs/KUBEVIRT_STACK.md": {
+      "sha256": "18ef3516c57dfbf88697eb5fc2b148037a553f0bb90be6424329fed150bb3c95",
+      "found": true
+    }
+  },
+  "runs": [
+    {
+      "started_at": "2026-10-29T02:34:55Z",
+      "finished_at": "2026-10-29T02:38:36Z",
+      "allowed_groups": [
+        "read",
+        "write",
+        "disruptive"
+      ],
+      "checks": "all"
+    },
+    {
+      "started_at": "2026-10-29T02:39:40Z",
+      "finished_at": "2026-10-29T02:39:56Z",
+      "allowed_groups": [
+        "read",
+        "write",
+        "disruptive"
+      ],
+      "checks": [
+        "coredns-respread",
+        "coredns-spread"
+      ],
+      "facts_read": false
+    },
+    {
+      "started_at": "2026-10-29T02:41:39Z",
+      "finished_at": "2026-10-29T02:44:18Z",
+      "allowed_groups": [
+        "read",
+        "destructive"
+      ],
+      "checks": [
+        "restore-api",
+        "restore-copy",
+        "restore-etcd-health",
+        "restore-marker-after",
+        "restore-marker-before",
+        "restore-members",
+        "restore-proof",
+        "restore-snapshot",
+        "restore-start-cp",
+        "restore-start-etcd",
+        "restore-stop",
+        "restore-swap"
+      ],
+      "facts_read": false
+    },
+    {
+      "rerecorded_at": "2026-10-29T06:08:28Z",
+      "checks": [],
+      "facts_read": false,
+      "note": "re-recorded for a changed runbook source: no fact read, no check run, nothing reached the cluster",
+      "repinned_comment_lines_only": [
+        "product-kits/kubevirt-stack/install/controlplane/kubeadm-config.yaml",
+        "product-kits/kubevirt-stack/install/controlplane/patches/kube-apiserver+strategic.yaml",
+        "product-kits/kubevirt-stack/install/network/bridge-netplan.example.yaml",
+        "product-kits/kubevirt-stack/install/kubevirt/kubevirt-cr.yaml",
+        "product-kits/kubevirt-stack/install/vm/local-disk-vm.yaml"
+      ]
+    },
+    {
+      "rerecorded_at": "2026-10-29T06:22:26Z",
+      "checks": [],
+      "facts_read": false,
+      "note": "re-recorded for a changed runbook source: no fact read, no check run, nothing reached the cluster",
+      "repinned_comment_lines_only": [
+        "product-kits/kubevirt-stack/install/network/nad-host-bridge.yaml",
+        "product-kits/kubevirt-stack/install/kubevirt/kubevirt-cr.yaml"
+      ]
+    },
+    {
+      "rerecorded_at": "2026-10-29T06:36:19Z",
+      "checks": [],
+      "facts_read": false,
+      "note": "re-recorded for a changed runbook source: no fact read, no check run, nothing reached the cluster"
+    },
+    {
+      "started_at": "2026-10-29T13:41:46Z",
+      "finished_at": "2026-10-29T13:44:31Z",
+      "allowed_groups": [
+        "read",
+        "destructive"
+      ],
+      "checks": [
+        "restore-api",
+        "restore-backup",
+        "restore-copy",
+        "restore-etcd-health",
+        "restore-from-backup",
+        "restore-marker-after",
+        "restore-marker-before",
+        "restore-members",
+        "restore-proof",
+        "restore-start-cp",
+        "restore-start-etcd",
+        "restore-stop",
+        "restore-swap"
+      ],
+      "facts_read": false
+    },
+    {
+      "rerecorded_at": "2026-10-29T13:49:48Z",
+      "checks": [],
+      "facts_read": false,
+      "note": "re-recorded for a changed runbook source: no fact read, no check run, nothing reached the cluster"
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+# A Linux bridge on the host uplink, for the Kubernetes VM Stack: the uplink is enslaved to the
+# bridge and the host's address moves onto the bridge, so a VM NIC that Multus attaches to the bridge
+# (nad-host-bridge.yaml, HOST_BRIDGE=${BRIDGE}) sits on the hosts' LAN, next to the hosts themselves, and takes its
+# address there (the LAN's DHCP or a static one). Proven on the integration test's three nodes.
+#
+# With the bridge in place, kube-vip's interface is the bridge, not the uplink: KUBE_VIP_INTERFACE=${BRIDGE} for
+# kube-vip-static-pod.sh (an existing kube-vip.yaml must be rendered again), and flannel follows the default route
+# onto the bridge by itself.
+#
+# Placeholders (envsubst), per host:
+#   ${UPLINK}       the uplink NIC (e.g. enp1s0)
+#   ${UPLINK_MAC}   its MAC address (ip -br link show ${UPLINK}); the bridge takes the same MAC, so a DHCP reservation
+#                   or ARP cache for the host keeps working
+#   ${BRIDGE}       the bridge's name (br0)
+#   ${HOST_CIDR}    the host's address, e.g. 10.77.0.11/24 (static: a cluster node keeps one address)
+#   ${GATEWAY}      the default gateway
+#   ${DNS}          the DNS server(s), comma-separated
+#
+# Apply it without locking yourself out (from the host's console if you can; over ssh the session survives when the
+# address and MAC stay the same):
+#   install -m 0600 bridge.yaml /etc/netplan/60-bridge.yaml   # netplan wants its files root-only
+#   netplan generate                                         # parse and render; stops on a syntax error
+#   netplan try --timeout 120                                # applies, and rolls back after 120 s unless you press ENTER
+# A cloud image's 50-cloud-init.yaml still configures ${UPLINK} with DHCP; this file overrides that (later files win),
+# and /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg with "network: {config: disabled}" keeps cloud-init from
+# writing it again.
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    ${UPLINK}:
+      match:
+        macaddress: "${UPLINK_MAC}"
+      set-name: ${UPLINK}
+      dhcp4: false
+      dhcp6: false
+  bridges:
+    ${BRIDGE}:
+      interfaces: [${UPLINK}]
+      macaddress: "${UPLINK_MAC}"
+      addresses: [${HOST_CIDR}]
+      routes:
+        - to: default
+          via: ${GATEWAY}
+      nameservers:
+        addresses: [${DNS}]
+      dhcp4: false
+      dhcp6: false
+      parameters:
+        stp: false
+        forward-delay: 0

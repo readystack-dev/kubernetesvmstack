@@ -1,0 +1,777 @@
+{
+  "schema": "kitforge.stack.v1",
+  "stack": "kubevirt-on-kubeadm",
+  "version": "v1.36.6-kubevirt1.9.1",
+  "_version_note": "The stack's own version (owner 2026-10-29: the stack ships as the image readystack/kubernetesvmstack): its Kubernetes line and its KubeVirt line, the two compat pins a customer upgrades by. The image's release tag is <version>-CE-scratch-r<N> (strategies/kubernetesvmstack.json).",
+  "_README": "The pin manifest for the Kubernetes VM Stack Kits (DevOps request 2026-10-28; plan docs/KUBEVIRT_STACK.md). It is the build's input: every kit's strategy must carry the commit pinned here, and each item's output digest is filled in once two clean --network=none builds of its kit agree. Versions follow the Kubernetes 1.36 line (owner 2026-10-28): KubeVirt 1.9 supports Kubernetes 1.34-1.36 and no KubeVirt release supports 1.37 yet.",
+  "compat": {
+    "kubernetes": "v1.36.6",
+    "kubevirt": "v1.9.1",
+    "etcd": "v3.7.3",
+    "coredns": "v1.14.2",
+    "pause": "3.10.2",
+    "containerd": "v2.3.7",
+    "runc": "v1.5.2",
+    "cni_plugins": "v1.9.1",
+    "cri_tools": "v1.36.0",
+    "kube_vip": "v1.3.1",
+    "flannel": "v0.28.10",
+    "flannel_cni_plugin": "v1.9.1-flannel3",
+    "multus_cni": "v4.3.2",
+    "go": "1.26.10",
+    "_why": {
+      "kubernetes": "Latest 1.36 patch (released 2026-10-28). KubeVirt's support matrix (kubevirt/sig-release releases/k8s-support-matrix.md) lists 1.9 against Kubernetes 1.34-1.36.",
+      "etcd": "Owner 2026-10-29: etcd v3.7.3, as the request asked: the live catalogue release readystack/etcd:v3.7.3-CE-ubuntu24.04-r1 (published 2026-10-27, signed, grade A), not a separate 3.6 line. Set through ClusterConfiguration etcd.local.imageTag (v3.7.3, the mirror's name); kubeadm's static Pod runs `command: [etcd, ...]` (bypassing the image's single-member entrypoint) as root through the kubeadm patch, and etcd 3.7.3 accepts every flag kubeadm v1.36.6 passes (integration test 2026-10-29). kubeadm v1.36.6 itself names 3.6.8-0.",
+      "coredns": "Exactly the version kubeadm v1.36.6 names (constants CoreDNSVersion), under kubeadm's own image tag: no dns.imageTag override. Was v1.14.7 until 2026-10-29 (main session, integration review E): kubeadm v1.36.6 vendors corefile-migration v1.0.31, which knows CoreDNS only up to 1.14.2, so kubeadm upgrade's preflight (checkMigration -> migration.Migrate) fails on a newer one.",
+      "pause": "Exactly the version kubeadm v1.36.6 names (PauseVersion).",
+      "containerd": "containerd's RELEASES.md lists 2.3.0+ for Kubernetes 1.36 and 1.37, so 2.3.x survives the later move to 1.37; v2.3.7 is its latest patch.",
+      "cri_tools": "crictl follows the Kubernetes minor.",
+      "go": "Go 1.26.10 for every component except where upstream requires newer: kube-vip builds on Go 1.27.3 (the 1.27 line's latest patch), because its go.mod requires 1.27.2, and its go directive stays as upstream wrote it (lowering it would change its GODEBUG defaults). KubeVirt v1.9.1's own builder pins 1.26.4, raised to 1.26.10 in its Bazel Go SDK pin only."
+    }
+  },
+  "holds": {
+    "_note": "Owner-held version lines (release/version_holds.py): scripts/rerelease-agenda.py never makes a NEW_VERSION off a line and scripts/retarget.py refuses to leave one; a same-version revision, and a newer release on the line, still are. `match` lists the upstream versions on the line; without it only the pinned version is.",
+    "kubernetes-1.36": {
+      "line": "Kubernetes 1.36",
+      "match": "v?1\\.36\\.\\d+",
+      "items": [
+        "kubeapiserver",
+        "kubecontrollermanager",
+        "kubescheduler",
+        "kubeproxy",
+        "kubernetesnode"
+      ],
+      "reason": "stay on Kubernetes 1.36 until KubeVirt supports 1.37 (KubeVirt 1.9 supports 1.34-1.36; owner 2026-10-28)"
+    },
+    "stack-v1.36.6-kubevirt1.9.1": {
+      "line": "v1.36.6-kubevirt1.9.1",
+      "items": [
+        "kubernetesvmstack"
+      ],
+      "reason": "the stack's version moves only with its components, by hand: its install bundle pins every item's digest, and Kubernetes stays on 1.36 until KubeVirt supports 1.37 (owner 2026-10-28)"
+    },
+    "coredns-1.14.2": {
+      "line": "CoreDNS v1.14.2",
+      "items": [
+        "coredns"
+      ],
+      "reason": "exactly the CoreDNS kubeadm v1.36.6 names: its corefile-migration v1.0.31 knows CoreDNS only up to 1.14.2, so kubeadm upgrade's preflight fails on a newer one (owner 2026-10-29)"
+    }
+  },
+  "components": [
+    {
+      "name": "kubernetes",
+      "repo": "https://github.com/kubernetes/kubernetes",
+      "ref": "v1.36.6",
+      "commit": "1b2171b110bb2a2542e1322035c6583ec86eb976",
+      "committed": "2026-10-27T12:02:52Z",
+      "license": "Apache-2.0"
+    },
+    {
+      "name": "etcd",
+      "repo": "https://github.com/etcd-io/etcd",
+      "ref": "v3.7.3",
+      "commit": "0a173d0410a96d01091b484daae81365bbcde57e",
+      "committed": "2026-10-22T23:01:34Z",
+      "license": "Apache-2.0"
+    },
+    {
+      "name": "coredns",
+      "repo": "https://github.com/coredns/coredns",
+      "ref": "v1.14.2",
+      "commit": "dd1df4f5db93767a44e37638df44969503b320d2",
+      "committed": "2026-03-06T04:49:45Z",
+      "license": "Apache-2.0"
+    },
+    {
+      "name": "containerd",
+      "repo": "https://github.com/containerd/containerd",
+      "ref": "v2.3.7",
+      "commit": "6f589cf13dc01a5b493911355427e05b2ff005d7",
+      "committed": "2026-10-13T22:33:38Z",
+      "license": "Apache-2.0"
+    },
+    {
+      "name": "runc",
+      "repo": "https://github.com/opencontainers/runc",
+      "ref": "v1.5.2",
+      "commit": "29dd3dc2b13b4123162e5fe132504bb4b15569f1",
+      "committed": "2026-09-24T21:12:22Z",
+      "license": "Apache-2.0"
+    },
+    {
+      "name": "cni-plugins",
+      "repo": "https://github.com/containernetworking/plugins",
+      "ref": "v1.9.1",
+      "commit": "adc3e6b5b581638afbd194cf2e9319ecbb0151a1",
+      "committed": "2026-02-19T11:31:52Z",
+      "license": "Apache-2.0"
+    },
+    {
+      "name": "cri-tools",
+      "repo": "https://github.com/kubernetes-sigs/cri-tools",
+      "ref": "v1.36.0",
+      "commit": "88d8ad9d40f82726fda53c2d271e6172b4c619c9",
+      "committed": "2026-04-24T15:40:48Z",
+      "license": "Apache-2.0"
+    },
+    {
+      "name": "kube-vip",
+      "repo": "https://github.com/kube-vip/kube-vip",
+      "ref": "v1.3.1",
+      "commit": "6da770eac1eed9409a9feaccda3d782c94424c24",
+      "committed": "2026-10-19T09:17:36Z",
+      "license": "Apache-2.0"
+    },
+    {
+      "name": "flannel",
+      "repo": "https://github.com/flannel-io/flannel",
+      "ref": "v0.28.10",
+      "commit": "0f70536f15f281279dab39fb9d575c646c7eea34",
+      "committed": "2026-10-08T15:03:44Z",
+      "license": "Apache-2.0"
+    },
+    {
+      "name": "flannel-cni-plugin",
+      "repo": "https://github.com/flannel-io/cni-plugin",
+      "ref": "v1.9.1-flannel3",
+      "commit": "b380f201008e9bed159703846cf10d3c50b4f9ce",
+      "committed": "2026-08-07T08:23:26Z",
+      "license": "Apache-2.0"
+    },
+    {
+      "name": "multus-cni",
+      "repo": "https://github.com/k8snetworkplumbingwg/multus-cni",
+      "ref": "v4.3.2",
+      "commit": "1d81062afcb32eb7290fa28bcbc482c3d0c5cae9",
+      "committed": "2026-10-21T07:01:58Z",
+      "license": "Apache-2.0"
+    },
+    {
+      "name": "kubevirt",
+      "repo": "https://github.com/kubevirt/kubevirt",
+      "ref": "v1.9.1",
+      "commit": "c3d19093f9c7b843b3879b18dc088911c081c39e",
+      "committed": "2026-10-09T05:21:13Z",
+      "license": "Apache-2.0",
+      "builder_image": "quay.io/kubevirt/builder:2606231619-4fe2cd536f",
+      "_builder_note": "hack/common.sh kubevirt_builder_version at v1.9.1 (CentOS Stream 9, Bazel 6.5.0); pinned by digest and carried in the kit like our golang builder."
+    },
+    {
+      "name": "iptables-wrappers (kube-proxy)",
+      "repo": "https://github.com/kubernetes-sigs/iptables-wrappers",
+      "ref": "v2",
+      "commit": "e139a115350974aac8a82ec4b815d2845f86997e",
+      "committed": "2022-04-12T12:29:31Z",
+      "license": "Apache-2.0",
+      "_why": "kube-proxy's image selects iptables-legacy or -nft with it, as kubernetes' distroless-iptables base does; that base downloads it from a floating URL, pinned here to the commit tag v2 names"
+    },
+    {
+      "name": "iptables-wrappers (flannel)",
+      "repo": "https://github.com/kubernetes-sigs/iptables-wrappers",
+      "commit": "bfef9e5087a198b50a4124bb9ce9d2c7c99025dd",
+      "committed": "2026-04-20T13:35:43Z",
+      "license": "Apache-2.0",
+      "_why": "the commit flannel v0.28.10's own Dockerfile builds"
+    }
+  ],
+  "items": [
+    {
+      "n": 1,
+      "item": "kubelet",
+      "slug": "kubernetesnode",
+      "kind": "host-binary",
+      "component_check": true,
+      "from": "kubernetes",
+      "profile": "host",
+      "owner_agent": "node",
+      "output": {
+        "slug": "kubernetesnode",
+        "tarball": "kubernetesnode-v1.36.6-linux-amd64.tar.gz",
+        "tarball_sha256": null,
+        "tarball_note": "not yet a published release output (strategies/kubernetesnode.json host_bundle.gates.tarball); the hand-proof tarball was 2c4411dcdf25e475854119026681ac27a8cae4d8aa0c3e450bf18325095cc39d, from the pre-SBOM tree. The acceptance run installs the nodes from the published image's own layer (its filesystem is the bundle tree), checked against the layer digest and the tree's SHA256SUMS",
+        "image": "readystack/kubernetesnode:v1.36.6-CE-scratch-r2",
+        "image_manifest_digest": "sha256:2499f6c4337ffb7fe76015657568c1aeb90276f17e8ad1328ea81e8141a441e3",
+        "index_digest": "sha256:d5ef075c6d25bee1d6859a0f91a69771efd47d2082fc1abe72820bdf05889315",
+        "output_basis": "the published release (Docker Hub, pushed 2026-11-07; chain 826, G8 rebuilt its kit offline to this digest before publishing): cosign-signed, with SLSA v1 provenance and an SPDX SBOM attached. Both digests read from Docker Hub on 2026-11-09 (the tag's index and its linux/amd64 image manifest, through the registry and the Hub tag API, which agree); the stack's acceptance run mirrors and verifies this digest",
+        "previous": {
+          "image": "readystack/kubernetesnode:v1.36.6-CE-scratch-r1",
+          "image_manifest_digest": "sha256:0a264881a0b7357fb20767b0922661bf4ba4423b3e90e595195bf18748a8d79c",
+          "index_digest": "sha256:665c06f34266e48226bb5321a05d403c960e0473f5cf8d6c58ef2e45be14bbaf",
+          "_note": "the release the stack's r1 and r2 bundles pinned (its own 2026-10-28/29 proof is in this file's git history and docs/KUBEVIRT_STACK.md)"
+        }
+      }
+    },
+    {
+      "n": 2,
+      "item": "kubeadm",
+      "slug": "kubernetesnode",
+      "kind": "host-binary",
+      "component_check": true,
+      "from": "kubernetes",
+      "profile": "host",
+      "owner_agent": "node",
+      "output": {
+        "slug": "kubernetesnode",
+        "tarball": "kubernetesnode-v1.36.6-linux-amd64.tar.gz",
+        "tarball_sha256": null,
+        "tarball_note": "not yet a published release output (strategies/kubernetesnode.json host_bundle.gates.tarball); the hand-proof tarball was 2c4411dcdf25e475854119026681ac27a8cae4d8aa0c3e450bf18325095cc39d, from the pre-SBOM tree. The acceptance run installs the nodes from the published image's own layer (its filesystem is the bundle tree), checked against the layer digest and the tree's SHA256SUMS",
+        "image": "readystack/kubernetesnode:v1.36.6-CE-scratch-r2",
+        "image_manifest_digest": "sha256:2499f6c4337ffb7fe76015657568c1aeb90276f17e8ad1328ea81e8141a441e3",
+        "index_digest": "sha256:d5ef075c6d25bee1d6859a0f91a69771efd47d2082fc1abe72820bdf05889315",
+        "output_basis": "the published release (Docker Hub, pushed 2026-11-07; chain 826, G8 rebuilt its kit offline to this digest before publishing): cosign-signed, with SLSA v1 provenance and an SPDX SBOM attached. Both digests read from Docker Hub on 2026-11-09 (the tag's index and its linux/amd64 image manifest, through the registry and the Hub tag API, which agree); the stack's acceptance run mirrors and verifies this digest",
+        "previous": {
+          "image": "readystack/kubernetesnode:v1.36.6-CE-scratch-r1",
+          "image_manifest_digest": "sha256:0a264881a0b7357fb20767b0922661bf4ba4423b3e90e595195bf18748a8d79c",
+          "index_digest": "sha256:665c06f34266e48226bb5321a05d403c960e0473f5cf8d6c58ef2e45be14bbaf",
+          "_note": "the release the stack's r1 and r2 bundles pinned (its own 2026-10-28/29 proof is in this file's git history and docs/KUBEVIRT_STACK.md)"
+        }
+      }
+    },
+    {
+      "n": 3,
+      "item": "kubectl",
+      "slug": "kubernetesnode",
+      "kind": "host-binary",
+      "component_check": true,
+      "from": "kubernetes",
+      "profile": "host",
+      "owner_agent": "node",
+      "output": {
+        "slug": "kubernetesnode",
+        "tarball": "kubernetesnode-v1.36.6-linux-amd64.tar.gz",
+        "tarball_sha256": null,
+        "tarball_note": "not yet a published release output (strategies/kubernetesnode.json host_bundle.gates.tarball); the hand-proof tarball was 2c4411dcdf25e475854119026681ac27a8cae4d8aa0c3e450bf18325095cc39d, from the pre-SBOM tree. The acceptance run installs the nodes from the published image's own layer (its filesystem is the bundle tree), checked against the layer digest and the tree's SHA256SUMS",
+        "image": "readystack/kubernetesnode:v1.36.6-CE-scratch-r2",
+        "image_manifest_digest": "sha256:2499f6c4337ffb7fe76015657568c1aeb90276f17e8ad1328ea81e8141a441e3",
+        "index_digest": "sha256:d5ef075c6d25bee1d6859a0f91a69771efd47d2082fc1abe72820bdf05889315",
+        "output_basis": "the published release (Docker Hub, pushed 2026-11-07; chain 826, G8 rebuilt its kit offline to this digest before publishing): cosign-signed, with SLSA v1 provenance and an SPDX SBOM attached. Both digests read from Docker Hub on 2026-11-09 (the tag's index and its linux/amd64 image manifest, through the registry and the Hub tag API, which agree); the stack's acceptance run mirrors and verifies this digest",
+        "previous": {
+          "image": "readystack/kubernetesnode:v1.36.6-CE-scratch-r1",
+          "image_manifest_digest": "sha256:0a264881a0b7357fb20767b0922661bf4ba4423b3e90e595195bf18748a8d79c",
+          "index_digest": "sha256:665c06f34266e48226bb5321a05d403c960e0473f5cf8d6c58ef2e45be14bbaf",
+          "_note": "the release the stack's r1 and r2 bundles pinned (its own 2026-10-28/29 proof is in this file's git history and docs/KUBEVIRT_STACK.md)"
+        }
+      }
+    },
+    {
+      "n": 4,
+      "item": "containerd",
+      "slug": "kubernetesnode",
+      "kind": "host-binary",
+      "component_check": true,
+      "from": "containerd",
+      "profile": "host",
+      "owner_agent": "node",
+      "output": {
+        "slug": "kubernetesnode",
+        "tarball": "kubernetesnode-v1.36.6-linux-amd64.tar.gz",
+        "tarball_sha256": null,
+        "tarball_note": "not yet a published release output (strategies/kubernetesnode.json host_bundle.gates.tarball); the hand-proof tarball was 2c4411dcdf25e475854119026681ac27a8cae4d8aa0c3e450bf18325095cc39d, from the pre-SBOM tree. The acceptance run installs the nodes from the published image's own layer (its filesystem is the bundle tree), checked against the layer digest and the tree's SHA256SUMS",
+        "image": "readystack/kubernetesnode:v1.36.6-CE-scratch-r2",
+        "image_manifest_digest": "sha256:2499f6c4337ffb7fe76015657568c1aeb90276f17e8ad1328ea81e8141a441e3",
+        "index_digest": "sha256:d5ef075c6d25bee1d6859a0f91a69771efd47d2082fc1abe72820bdf05889315",
+        "output_basis": "the published release (Docker Hub, pushed 2026-11-07; chain 826, G8 rebuilt its kit offline to this digest before publishing): cosign-signed, with SLSA v1 provenance and an SPDX SBOM attached. Both digests read from Docker Hub on 2026-11-09 (the tag's index and its linux/amd64 image manifest, through the registry and the Hub tag API, which agree); the stack's acceptance run mirrors and verifies this digest",
+        "previous": {
+          "image": "readystack/kubernetesnode:v1.36.6-CE-scratch-r1",
+          "image_manifest_digest": "sha256:0a264881a0b7357fb20767b0922661bf4ba4423b3e90e595195bf18748a8d79c",
+          "index_digest": "sha256:665c06f34266e48226bb5321a05d403c960e0473f5cf8d6c58ef2e45be14bbaf",
+          "_note": "the release the stack's r1 and r2 bundles pinned (its own 2026-10-28/29 proof is in this file's git history and docs/KUBEVIRT_STACK.md)"
+        }
+      }
+    },
+    {
+      "n": 5,
+      "item": "runc",
+      "slug": "kubernetesnode",
+      "kind": "host-binary",
+      "component_check": true,
+      "from": "runc",
+      "profile": "host",
+      "owner_agent": "node",
+      "output": {
+        "slug": "kubernetesnode",
+        "tarball": "kubernetesnode-v1.36.6-linux-amd64.tar.gz",
+        "tarball_sha256": null,
+        "tarball_note": "not yet a published release output (strategies/kubernetesnode.json host_bundle.gates.tarball); the hand-proof tarball was 2c4411dcdf25e475854119026681ac27a8cae4d8aa0c3e450bf18325095cc39d, from the pre-SBOM tree. The acceptance run installs the nodes from the published image's own layer (its filesystem is the bundle tree), checked against the layer digest and the tree's SHA256SUMS",
+        "image": "readystack/kubernetesnode:v1.36.6-CE-scratch-r2",
+        "image_manifest_digest": "sha256:2499f6c4337ffb7fe76015657568c1aeb90276f17e8ad1328ea81e8141a441e3",
+        "index_digest": "sha256:d5ef075c6d25bee1d6859a0f91a69771efd47d2082fc1abe72820bdf05889315",
+        "output_basis": "the published release (Docker Hub, pushed 2026-11-07; chain 826, G8 rebuilt its kit offline to this digest before publishing): cosign-signed, with SLSA v1 provenance and an SPDX SBOM attached. Both digests read from Docker Hub on 2026-11-09 (the tag's index and its linux/amd64 image manifest, through the registry and the Hub tag API, which agree); the stack's acceptance run mirrors and verifies this digest",
+        "previous": {
+          "image": "readystack/kubernetesnode:v1.36.6-CE-scratch-r1",
+          "image_manifest_digest": "sha256:0a264881a0b7357fb20767b0922661bf4ba4423b3e90e595195bf18748a8d79c",
+          "index_digest": "sha256:665c06f34266e48226bb5321a05d403c960e0473f5cf8d6c58ef2e45be14bbaf",
+          "_note": "the release the stack's r1 and r2 bundles pinned (its own 2026-10-28/29 proof is in this file's git history and docs/KUBEVIRT_STACK.md)"
+        }
+      }
+    },
+    {
+      "n": 6,
+      "item": "cni-plugins",
+      "slug": "kubernetesnode",
+      "kind": "host-binary",
+      "component_check": true,
+      "from": "cni-plugins",
+      "profile": "host",
+      "owner_agent": "node",
+      "output": {
+        "slug": "kubernetesnode",
+        "tarball": "kubernetesnode-v1.36.6-linux-amd64.tar.gz",
+        "tarball_sha256": null,
+        "tarball_note": "not yet a published release output (strategies/kubernetesnode.json host_bundle.gates.tarball); the hand-proof tarball was 2c4411dcdf25e475854119026681ac27a8cae4d8aa0c3e450bf18325095cc39d, from the pre-SBOM tree. The acceptance run installs the nodes from the published image's own layer (its filesystem is the bundle tree), checked against the layer digest and the tree's SHA256SUMS",
+        "image": "readystack/kubernetesnode:v1.36.6-CE-scratch-r2",
+        "image_manifest_digest": "sha256:2499f6c4337ffb7fe76015657568c1aeb90276f17e8ad1328ea81e8141a441e3",
+        "index_digest": "sha256:d5ef075c6d25bee1d6859a0f91a69771efd47d2082fc1abe72820bdf05889315",
+        "output_basis": "the published release (Docker Hub, pushed 2026-11-07; chain 826, G8 rebuilt its kit offline to this digest before publishing): cosign-signed, with SLSA v1 provenance and an SPDX SBOM attached. Both digests read from Docker Hub on 2026-11-09 (the tag's index and its linux/amd64 image manifest, through the registry and the Hub tag API, which agree); the stack's acceptance run mirrors and verifies this digest",
+        "previous": {
+          "image": "readystack/kubernetesnode:v1.36.6-CE-scratch-r1",
+          "image_manifest_digest": "sha256:0a264881a0b7357fb20767b0922661bf4ba4423b3e90e595195bf18748a8d79c",
+          "index_digest": "sha256:665c06f34266e48226bb5321a05d403c960e0473f5cf8d6c58ef2e45be14bbaf",
+          "_note": "the release the stack's r1 and r2 bundles pinned (its own 2026-10-28/29 proof is in this file's git history and docs/KUBEVIRT_STACK.md)"
+        }
+      }
+    },
+    {
+      "n": 7,
+      "item": "crictl",
+      "slug": "kubernetesnode",
+      "kind": "host-binary",
+      "component_check": true,
+      "from": "cri-tools",
+      "profile": "host",
+      "owner_agent": "node",
+      "output": {
+        "slug": "kubernetesnode",
+        "tarball": "kubernetesnode-v1.36.6-linux-amd64.tar.gz",
+        "tarball_sha256": null,
+        "tarball_note": "not yet a published release output (strategies/kubernetesnode.json host_bundle.gates.tarball); the hand-proof tarball was 2c4411dcdf25e475854119026681ac27a8cae4d8aa0c3e450bf18325095cc39d, from the pre-SBOM tree. The acceptance run installs the nodes from the published image's own layer (its filesystem is the bundle tree), checked against the layer digest and the tree's SHA256SUMS",
+        "image": "readystack/kubernetesnode:v1.36.6-CE-scratch-r2",
+        "image_manifest_digest": "sha256:2499f6c4337ffb7fe76015657568c1aeb90276f17e8ad1328ea81e8141a441e3",
+        "index_digest": "sha256:d5ef075c6d25bee1d6859a0f91a69771efd47d2082fc1abe72820bdf05889315",
+        "output_basis": "the published release (Docker Hub, pushed 2026-11-07; chain 826, G8 rebuilt its kit offline to this digest before publishing): cosign-signed, with SLSA v1 provenance and an SPDX SBOM attached. Both digests read from Docker Hub on 2026-11-09 (the tag's index and its linux/amd64 image manifest, through the registry and the Hub tag API, which agree); the stack's acceptance run mirrors and verifies this digest",
+        "previous": {
+          "image": "readystack/kubernetesnode:v1.36.6-CE-scratch-r1",
+          "image_manifest_digest": "sha256:0a264881a0b7357fb20767b0922661bf4ba4423b3e90e595195bf18748a8d79c",
+          "index_digest": "sha256:665c06f34266e48226bb5321a05d403c960e0473f5cf8d6c58ef2e45be14bbaf",
+          "_note": "the release the stack's r1 and r2 bundles pinned (its own 2026-10-28/29 proof is in this file's git history and docs/KUBEVIRT_STACK.md)"
+        }
+      }
+    },
+    {
+      "n": 8,
+      "item": "virtctl",
+      "kind": "host-binary",
+      "component_check": true,
+      "from": "kubevirt",
+      "profile": "host",
+      "owner_agent": "kubevirt",
+      "output": {
+        "slug": "virtctl",
+        "image": "readystack/virtctl:v1.9.1-CE-scratch-r2",
+        "image_manifest_digest": "sha256:a927e490ae9fb76f338ab6ba3aa61e653a37084b4a2eb7076bac76751bdd302a",
+        "index_digest": "sha256:b95c5d1eb381990e1c4c5c5c6362dbcaee083125a3de20b084deab9d45edb93d",
+        "binary_sha256": "9aa37c644b1ec5001b5dab9c707d8ccbf971d88bfd56540926d01230479cd73b",
+        "tarball": "virtctl-v1.9.1-linux-amd64.tar.gz",
+        "tarball_sha256": "0544ea109577aaea94f1e6c57b25e1c625a2f4a7915569a7c47a1ad328ac7b73",
+        "output_basis": "the published release (Docker Hub, pushed 2026-11-09; chain 879, G8 rebuilt its kit offline to this digest before publishing): cosign-signed, with SLSA v1 provenance and an SPDX SBOM attached. Both digests read from Docker Hub on 2026-11-09 (the tag's index and its linux/amd64 image manifest, through the registry and the Hub tag API, which agree); binary_sha256 and tarball_sha256 are those of /virtctl and /virtctl-v1.9.1-linux-amd64.tar.gz in the image's single layer (sha256:063241064dbae2ef3287c105818a659af55b8efb04b4fd6742a5c8fea9ae2a9c), read the same day: the tarball's own .sha256 checks and it holds the same binary. The stack's acceptance run takes virtctl from this image and verifies it",
+        "previous": {
+          "image": "readystack/virtctl:v1.9.1-CE-scratch-r1",
+          "image_manifest_digest": "sha256:634431da66d601627ffc0cddd0e41d02678ff5c1a2f6407661ae9f8a85091501",
+          "binary_sha256": "3fa75ba9a2310de716b49b383019d341bd420e951587856613ae0d420db16543",
+          "tarball_sha256": "6ef6825d0f1b10649bcea5949a3a27b1452d90b3c26934b85064a684d18a0202",
+          "_note": "the release the stack's r1 and r2 bundles pinned (its own 2026-10-28/29 proof is in this file's git history and docs/KUBEVIRT_STACK.md)"
+        }
+      }
+    },
+    {
+      "n": 9,
+      "item": "kube-apiserver",
+      "kind": "image",
+      "component_check": true,
+      "from": "kubernetes",
+      "profile": "kubeadm-compat",
+      "owner_agent": "controlplane",
+      "output": {
+        "slug": "kubeapiserver",
+        "image": "readystack/kubeapiserver:v1.36.6-CE-ubuntu24.04-r2",
+        "image_manifest_digest": "sha256:5407936de875e728ca7b2826853ccb8f186c776300da4ddb4ace211b35ac6062",
+        "index_digest": "sha256:244486952d9430d01e55f8052291d6e71b5adcfa9155e65ab59e96eb0f7b2f11",
+        "output_basis": "the published release (Docker Hub, pushed 2026-11-09; chain 905, G8 rebuilt its kit offline to this digest before publishing): cosign-signed, with SLSA v1 provenance and an SPDX SBOM attached. Both digests read from Docker Hub on 2026-11-09 (the tag's index and its linux/amd64 image manifest, through the registry and the Hub tag API, which agree); the stack's acceptance run mirrors and verifies this digest",
+        "previous": {
+          "image": "readystack/kubeapiserver:v1.36.6-CE-ubuntu24.04-r1",
+          "image_manifest_digest": "sha256:49c4d7708668d7ab42ae0d1d3d584063f67ef87f2d746e21d6709288afdb997e",
+          "_note": "the release the stack's r1 and r2 bundles pinned (its own 2026-10-28/29 proof is in this file's git history and docs/KUBEVIRT_STACK.md)"
+        }
+      }
+    },
+    {
+      "n": 10,
+      "item": "kube-controller-manager",
+      "kind": "image",
+      "component_check": true,
+      "from": "kubernetes",
+      "profile": "kubeadm-compat",
+      "owner_agent": "controlplane",
+      "output": {
+        "slug": "kubecontrollermanager",
+        "image": "readystack/kubecontrollermanager:v1.36.6-CE-ubuntu24.04-r2",
+        "image_manifest_digest": "sha256:76b1be21fad73f4a416bf868bac3a8fe312c314f4df25e4aeabbe39ac5826d96",
+        "index_digest": "sha256:b31320a807e19e34be43563a0c9241913502b5258a76b7842c0ccb82b04d3e50",
+        "output_basis": "the published release (Docker Hub, pushed 2026-11-09; chain 903, G8 rebuilt its kit offline to this digest before publishing): cosign-signed, with SLSA v1 provenance and an SPDX SBOM attached. Both digests read from Docker Hub on 2026-11-09 (the tag's index and its linux/amd64 image manifest, through the registry and the Hub tag API, which agree); the stack's acceptance run mirrors and verifies this digest",
+        "previous": {
+          "image": "readystack/kubecontrollermanager:v1.36.6-CE-ubuntu24.04-r1",
+          "image_manifest_digest": "sha256:f832d6d6174e904cb86f178379571f02421cd5e056f112da12062aec8d2f93a2",
+          "_note": "the release the stack's r1 and r2 bundles pinned (its own 2026-10-28/29 proof is in this file's git history and docs/KUBEVIRT_STACK.md)"
+        }
+      }
+    },
+    {
+      "n": 11,
+      "item": "kube-scheduler",
+      "kind": "image",
+      "component_check": true,
+      "from": "kubernetes",
+      "profile": "kubeadm-compat",
+      "owner_agent": "controlplane",
+      "output": {
+        "slug": "kubescheduler",
+        "image": "readystack/kubescheduler:v1.36.6-CE-ubuntu24.04-r2",
+        "image_manifest_digest": "sha256:35158b727d4cbf5e2b15c39374ef1942dca98a1b4394ed2812953b443829f39f",
+        "index_digest": "sha256:2507c75b079fa0723518f9de1b9ec3f7853eca61d0b465e45178966e03839146",
+        "output_basis": "the published release (Docker Hub, pushed 2026-11-09; chain 902, G8 rebuilt its kit offline to this digest before publishing): cosign-signed, with SLSA v1 provenance and an SPDX SBOM attached. Both digests read from Docker Hub on 2026-11-09 (the tag's index and its linux/amd64 image manifest, through the registry and the Hub tag API, which agree); the stack's acceptance run mirrors and verifies this digest",
+        "previous": {
+          "image": "readystack/kubescheduler:v1.36.6-CE-ubuntu24.04-r1",
+          "image_manifest_digest": "sha256:db92258d58a8e98424edd20418624e6625c4360acedd4dd919443a3e538c9ef8",
+          "_note": "the release the stack's r1 and r2 bundles pinned (its own 2026-10-28/29 proof is in this file's git history and docs/KUBEVIRT_STACK.md)"
+        }
+      }
+    },
+    {
+      "n": 12,
+      "item": "kube-proxy",
+      "kind": "image",
+      "component_check": true,
+      "from": "kubernetes",
+      "profile": "kubeadm-compat",
+      "owner_agent": "controlplane",
+      "output": {
+        "slug": "kubeproxy",
+        "image": "readystack/kubeproxy:v1.36.6-CE-ubuntu24.04-r2",
+        "image_manifest_digest": "sha256:6c996278676c933a0b4b1f1eafa738d314e150117fbd7b4f1d5e5c2e95bdd58a",
+        "index_digest": "sha256:81061bf1cae874295555934361682ed881b2445b946edda3eefda5766a0d679e",
+        "output_basis": "the published release (Docker Hub, pushed 2026-11-09; chain 906, G8 rebuilt its kit offline to this digest before publishing): cosign-signed, with SLSA v1 provenance and an SPDX SBOM attached. Both digests read from Docker Hub on 2026-11-09 (the tag's index and its linux/amd64 image manifest, through the registry and the Hub tag API, which agree); the stack's acceptance run mirrors and verifies this digest",
+        "previous": {
+          "image": "readystack/kubeproxy:v1.36.6-CE-ubuntu24.04-r1",
+          "image_manifest_digest": "sha256:690fd8d24cd4ffbf70dbe1ba26ac48ce80a972d7183cf691948ff5ff8ca8d56c",
+          "_note": "the release the stack's r1 and r2 bundles pinned (its own 2026-10-28/29 proof is in this file's git history and docs/KUBEVIRT_STACK.md)"
+        }
+      }
+    },
+    {
+      "n": 13,
+      "item": "etcd",
+      "kind": "image",
+      "from": "etcd",
+      "profile": "kubeadm-compat",
+      "owner_agent": "node",
+      "output": {
+        "slug": "etcd",
+        "image": "readystack/etcd:v3.7.3-CE-ubuntu24.04-r2",
+        "image_manifest_digest": "sha256:9a7eeb94f59ccd9fe6f5e1927aa9fe71804ee01b3e2c522bdc368074fd418d25",
+        "index_digest": "sha256:4d36902b4d88897871df9da220be342299b21b0f216f3e0307e766d9eeb14be4",
+        "output_basis": "the published release (Docker Hub, pushed 2026-11-08; chain 742, G8 rebuilt its kit offline to this digest before publishing): cosign-signed, with SLSA v1 provenance and an SPDX SBOM attached. Both digests read from Docker Hub on 2026-11-09 (the tag's index and its linux/amd64 image manifest, through the registry and the Hub tag API, which agree); the stack's acceptance run mirrors and verifies this digest",
+        "previous": {
+          "image": "readystack/etcd:v3.7.3-CE-ubuntu24.04-r1",
+          "image_manifest_digest": "sha256:b21b8089f1957b35bfaf54647f871c1e9e56d36d20af32a2fdb9b2b6483d62f6",
+          "index_digest": "sha256:b86345e29e39a9d41a26af8d79b9e784c26fb9c6b4614340e6ce663f12fe8f1b",
+          "_note": "the release the stack's r1 and r2 bundles pinned (its own 2026-10-28/29 proof is in this file's git history and docs/KUBEVIRT_STACK.md)"
+        },
+        "_why": "Owner 2026-10-29: the request's etcd v3.7.3 is the live catalogue release, reused as it is: no new line or variant (strategies/etcd-3.6.json, a v3.6.16 second line, is withdrawn). r1 (chain 698) until stack r2; r2 (chain 742) is its revision on a chiselled Ubuntu 24.04 runtime: etcd, etcdctl and etcdutl as in r1, no bash, curl, grep, ls or id in the image (the runbook and the install bundle exec only etcdctl and etcdutl in it, and kubeadm's static pod probes it over HTTP)."
+      }
+    },
+    {
+      "n": 14,
+      "item": "kube-vip",
+      "kind": "image",
+      "component_check": true,
+      "from": "kube-vip",
+      "profile": "node-system",
+      "owner_agent": "network",
+      "output": {
+        "slug": "kubevip",
+        "image": "readystack/kubevip:v1.3.1-CE-ubuntu24.04-r2",
+        "image_manifest_digest": "sha256:4d386696413b5756606ff3ea0616ae0508191f84851518a5bdbd9774922943b4",
+        "index_digest": "sha256:d5070fd670080e1b5035a787d03451c60141e2f6d9a677f2f632d5cc34fa5c2f",
+        "output_basis": "the published release (Docker Hub, pushed 2026-11-07; chain 859, G8 rebuilt its kit offline to this digest before publishing): cosign-signed, with SLSA v1 provenance and an SPDX SBOM attached. Both digests read from Docker Hub on 2026-11-09 (the tag's index and its linux/amd64 image manifest, through the registry and the Hub tag API, which agree); the stack's acceptance run mirrors and verifies this digest",
+        "previous": {
+          "image": "readystack/kubevip:v1.3.1-CE-ubuntu24.04-r1",
+          "image_manifest_digest": "sha256:74dd28c7b8af69cd7cf4684338b782d1fbf939a1dbfabeb1545d70b077cf934b",
+          "_note": "the release the stack's r1 and r2 bundles pinned (its own 2026-10-28/29 proof is in this file's git history and docs/KUBEVIRT_STACK.md)"
+        }
+      }
+    },
+    {
+      "n": 15,
+      "item": "flannel",
+      "kind": "image",
+      "component_check": true,
+      "from": "flannel",
+      "profile": "node-system",
+      "owner_agent": "network",
+      "output": {
+        "slug": "flannel",
+        "image": "readystack/flannel:v0.28.10-CE-ubuntu24.04-r2",
+        "image_manifest_digest": "sha256:1c243ea251fb0ac6f44b31a2818def37c0b1e417f9d8ff359d62ff1beb6cd5bf",
+        "index_digest": "sha256:4cfb670bf2be6234b00348b576e89e7be18fcb480e63a4b067c76a9cbabfce84",
+        "output_basis": "the published release (Docker Hub, pushed 2026-11-07; chain 845, G8 rebuilt its kit offline to this digest before publishing): cosign-signed, with SLSA v1 provenance and an SPDX SBOM attached. Both digests read from Docker Hub on 2026-11-09 (the tag's index and its linux/amd64 image manifest, through the registry and the Hub tag API, which agree); the stack's acceptance run mirrors and verifies this digest",
+        "previous": {
+          "image": "readystack/flannel:v0.28.10-CE-ubuntu24.04-r1",
+          "image_manifest_digest": "sha256:6d3fb1140502d71df92ae2b107532acaf809aa42a94e2e6b9eec291fab4b8856",
+          "index_digest": "sha256:18ed7f68631367725ac49bc573bb3b804e997469a7a8a04958a1a74b6cfe33ce",
+          "_note": "the release the stack's r1 and r2 bundles pinned (its own 2026-10-28/29 proof is in this file's git history and docs/KUBEVIRT_STACK.md)"
+        }
+      }
+    },
+    {
+      "n": 16,
+      "item": "flannel-cni-plugin",
+      "kind": "image",
+      "component_check": true,
+      "from": "flannel-cni-plugin",
+      "profile": "node-system",
+      "owner_agent": "network",
+      "output": {
+        "slug": "flannelcniplugin",
+        "image": "readystack/flannelcniplugin:v1.9.1-flannel3-CE-ubuntu24.04-r1",
+        "image_manifest_digest": "sha256:4511acd7413d1e6fd78d3d712921d794cb820a3b62973512532d7b64f2cc4e8a",
+        "proven": "2026-10-28 <redacted: internal host> (network stream): two clean --network=none builds, each on a fresh BuildKit v0.31.2 builder with --no-cache, gave this digest; the integration stream checked that the stream's out1.oci.tar holds exactly this linux/amd64 image manifest and that the kit it was built from is byte-identical to the branch's (gen_dockerfile render or hand kit)",
+        "output_basis": "hand proof 2026-10-28 (two clean --network=none builds on <redacted: internal host>); the pipeline re-vendors online and its canonical build decides the published digest, which may differ"
+      }
+    },
+    {
+      "n": 17,
+      "item": "multus-cni (thin)",
+      "slug": "multuscni",
+      "kind": "image",
+      "component_check": true,
+      "from": "multus-cni",
+      "profile": "node-system",
+      "owner_agent": "network",
+      "output": {
+        "slug": "multuscni",
+        "image": "readystack/multuscni:v4.3.2-CE-ubuntu24.04-r1",
+        "image_manifest_digest": "sha256:4f83336538e07ecb26828be35bc7cbd644c3f8d6ca539eaa11ff5ebcb018fc6f",
+        "index_digest": "sha256:f1f72c27748bae8c5b0e7ac74831255df2bd01f96db506e22d857004a16e004d",
+        "output_basis": "the published release (Docker Hub, pushed 2026-11-08; chain 885, G8 rebuilt its kit offline to this digest before publishing): cosign-signed, with SLSA v1 provenance and an SPDX SBOM attached. Both digests read from Docker Hub on 2026-11-09 (the tag's index and its linux/amd64 image manifest, through the registry and the Hub tag API, which agree); the stack's acceptance run mirrors and verifies this digest",
+        "previous": {
+          "image": "readystack/multuscni:v4.3.1-CE-ubuntu24.04-r1",
+          "image_manifest_digest": "sha256:f90014221243e98cf21d56dc66e3f53bf386c1c1484a633e550dadf4e39f324e",
+          "_note": "the release the stack's r1 and r2 bundles pinned (its own 2026-10-28/29 proof is in this file's git history and docs/KUBEVIRT_STACK.md)"
+        }
+      }
+    },
+    {
+      "n": 18,
+      "item": "virt-handler",
+      "kind": "image",
+      "component_check": true,
+      "may_unlist": true,
+      "from": "kubevirt",
+      "profile": "node-system",
+      "owner_agent": "kubevirt",
+      "output": {
+        "slug": "virthandler",
+        "image": "readystack/virthandler:v1.9.1-CE-centos9-r2",
+        "image_manifest_digest": "sha256:1fe4c6662d21fba80d7790c86b73afbc3030f4aa9192848c321395853bed082b",
+        "index_digest": "sha256:9f5dde56eb878ccfe9583bb063f60c602d87484fcaee82c6bb4047061f2bb3e1",
+        "output_basis": "the published release (Docker Hub, pushed 2026-11-08; chain 877, G8 rebuilt its kit offline to this digest before publishing): cosign-signed, with SLSA v1 provenance and an SPDX SBOM attached. Both digests read from Docker Hub on 2026-11-09 (the tag's index and its linux/amd64 image manifest, through the registry and the Hub tag API, which agree); the stack's acceptance run mirrors and verifies this digest",
+        "previous": {
+          "image": "readystack/virthandler:v1.9.1-CE-centos9-r1",
+          "image_manifest_digest": "sha256:cc95abc1a3ac1202eeb71e3f3d4cab910163d8e6b141eaddbcaaf181c709a82a",
+          "_note": "the release the stack's r1 and r2 bundles pinned (its own 2026-10-28/29 proof is in this file's git history and docs/KUBEVIRT_STACK.md)"
+        }
+      }
+    },
+    {
+      "n": 19,
+      "item": "coredns",
+      "kind": "image",
+      "from": "coredns",
+      "profile": "standard-nonroot",
+      "owner_agent": "node",
+      "output": {
+        "slug": "coredns",
+        "image": "readystack/coredns:v1.14.2-CE-ubuntu24.04-r2",
+        "image_manifest_digest": "sha256:c777c878e9b29e7c7f4a86e392ffc591350ccf0c02c3d57d38c410f74b4c2eed",
+        "index_digest": "sha256:136912fbcb8e25ea2e76b74b922556d006d8db92250b373a8b447bee047c366a",
+        "output_basis": "the published release (Docker Hub, pushed 2026-11-07; chain 841, G8 rebuilt its kit offline to this digest before publishing): cosign-signed, with SLSA v1 provenance and an SPDX SBOM attached. Both digests read from Docker Hub on 2026-11-09 (the tag's index and its linux/amd64 image manifest, through the registry and the Hub tag API, which agree); the stack's acceptance run mirrors and verifies this digest",
+        "previous": {
+          "image": "readystack/coredns:v1.14.2-CE-ubuntu24.04-r1",
+          "image_manifest_digest": "sha256:faf5d9691f306d7f318377a2db731aa843ef8ed23866e7c410cdbc001dda2c4b",
+          "_note": "the release the stack's r1 and r2 bundles pinned (its own 2026-10-28/29 proof is in this file's git history and docs/KUBEVIRT_STACK.md)"
+        }
+      }
+    },
+    {
+      "n": 20,
+      "item": "pause",
+      "kind": "image",
+      "component_check": true,
+      "from": "kubernetes",
+      "profile": "standard-nonroot",
+      "owner_agent": "controlplane",
+      "output": {
+        "slug": "pause",
+        "image": "readystack/pause:3.10.2-CE-scratch-r1",
+        "image_manifest_digest": "sha256:6b74cfa71db2c51e1a21e3342402d3993573ea02a0c85063897eda87958dca26",
+        "index_digest": "sha256:205b1d99aed2a00e741d04e7a9dede1ee8eca72e392088e3e2c0d1d0cf649253",
+        "proven": "2026-10-28 <redacted: internal host>: two clean --network=none builds (fresh BuildKit v0.31.2 builders; the second with every FROM from the vendored OCI layouts) gave this digest; the pipeline's vendor run and canonical build decide the published one",
+        "output_basis": "the published release (Docker Hub, 2026-10-29): cosign-signed, with SLSA v1 provenance and an SPDX SBOM attached; the stack's acceptance run mirrors and verifies this digest",
+        "hand_proof_digest": "sha256:3f755e85d22288dbb1ae6595ea088b6f1a9271a4185fe9d5edae7fbb9f599b3e",
+        "published_differs_because": "the release declares its static linking in an SPDX SBOM inside the image (PR #12), so its bytes differ from the 2026-10-28 hand proof",
+        "integration_rebuild": "2026-10-28 integration stream (product-kits/kubevirt-stack/test/INTEGRATION_REPORT.md): the branch kit vendored again online (Dockerfile.vendor --target export, as assemble_kit) and rebuilt through the customer BUILD_OFFLINE.sh (pinned BuildKit v0.31.2 from toolchain/, every FROM from a vendored OCI layout, --no-cache --network=none) on <redacted: internal host> and, separately vendored, on <redacted: internal host>: both gave this digest"
+      }
+    },
+    {
+      "n": 21,
+      "item": "virt-operator",
+      "kind": "image",
+      "component_check": true,
+      "from": "kubevirt",
+      "profile": "standard-nonroot",
+      "owner_agent": "kubevirt",
+      "output": {
+        "slug": "virtoperator",
+        "image": "readystack/virtoperator:v1.9.1-CE-debian12-r2",
+        "image_manifest_digest": "sha256:be9ccc3a11c3ebcf9701ce573df96a8140dd7d4d41be5d747bde72729ea3fe78",
+        "index_digest": "sha256:c7cb0c36ad11555a5d7a0fd4d104f331eaa60a76599069a7f55cc836b8bc5079",
+        "output_basis": "the published release (Docker Hub, pushed 2026-11-08; chain 873, G8 rebuilt its kit offline to this digest before publishing): cosign-signed, with SLSA v1 provenance and an SPDX SBOM attached. Both digests read from Docker Hub on 2026-11-09 (the tag's index and its linux/amd64 image manifest, through the registry and the Hub tag API, which agree); the stack's acceptance run mirrors and verifies this digest",
+        "previous": {
+          "image": "readystack/virtoperator:v1.9.1-CE-debian12-r1",
+          "image_manifest_digest": "sha256:78de21c348d6b5c03db14e9b14e4fe02f947114771f8897f53c2f52bf435a0a6",
+          "_note": "the release the stack's r1 and r2 bundles pinned (its own 2026-10-28/29 proof is in this file's git history and docs/KUBEVIRT_STACK.md)"
+        }
+      }
+    },
+    {
+      "n": 22,
+      "item": "virt-api",
+      "kind": "image",
+      "component_check": true,
+      "from": "kubevirt",
+      "profile": "standard-nonroot",
+      "owner_agent": "kubevirt",
+      "output": {
+        "slug": "virtapi",
+        "image": "readystack/virtapi:v1.9.1-CE-debian12-r2",
+        "image_manifest_digest": "sha256:38ee20d8459ac3344e048c09fb4295a29ad9615f08037dfb8a2e651cee253ae2",
+        "index_digest": "sha256:65177dc67dc11ed39de81fa63968e08cc768b7525fcde52aa0c8dc959f670a31",
+        "output_basis": "the published release (Docker Hub, pushed 2026-11-08; chain 874, G8 rebuilt its kit offline to this digest before publishing): cosign-signed, with SLSA v1 provenance and an SPDX SBOM attached. Both digests read from Docker Hub on 2026-11-09 (the tag's index and its linux/amd64 image manifest, through the registry and the Hub tag API, which agree); the stack's acceptance run mirrors and verifies this digest",
+        "previous": {
+          "image": "readystack/virtapi:v1.9.1-CE-debian12-r1",
+          "image_manifest_digest": "sha256:1b50959eea78ae4db3a6037b90943ada86b9cb5426bb4790525316087d0ff582",
+          "_note": "the release the stack's r1 and r2 bundles pinned (its own 2026-10-28/29 proof is in this file's git history and docs/KUBEVIRT_STACK.md)"
+        }
+      }
+    },
+    {
+      "n": 23,
+      "item": "virt-controller",
+      "kind": "image",
+      "component_check": true,
+      "from": "kubevirt",
+      "profile": "standard-nonroot",
+      "owner_agent": "kubevirt",
+      "output": {
+        "slug": "virtcontroller",
+        "image": "readystack/virtcontroller:v1.9.1-CE-debian12-r2",
+        "image_manifest_digest": "sha256:d19615aad99d9715a0cf91e41647795dac2d49ee7c2b6acc83d2fbed1c1212c5",
+        "index_digest": "sha256:4d3bda37aecbdf99ff07c02f17978f8ee800179f0172981d17b0ac26ea9142ec",
+        "output_basis": "the published release (Docker Hub, pushed 2026-11-08; chain 875, G8 rebuilt its kit offline to this digest before publishing): cosign-signed, with SLSA v1 provenance and an SPDX SBOM attached. Both digests read from Docker Hub on 2026-11-09 (the tag's index and its linux/amd64 image manifest, through the registry and the Hub tag API, which agree); the stack's acceptance run mirrors and verifies this digest",
+        "previous": {
+          "image": "readystack/virtcontroller:v1.9.1-CE-debian12-r1",
+          "image_manifest_digest": "sha256:4e9192b84b55aa401f992f0337ac4a76e79d25ff2519e803274a3c353b01ad12",
+          "_note": "the release the stack's r1 and r2 bundles pinned (its own 2026-10-28/29 proof is in this file's git history and docs/KUBEVIRT_STACK.md)"
+        }
+      }
+    },
+    {
+      "n": 24,
+      "item": "virt-launcher",
+      "kind": "image",
+      "component_check": true,
+      "may_unlist": true,
+      "from": "kubevirt",
+      "profile": "standard-nonroot",
+      "owner_agent": "kubevirt",
+      "output": {
+        "slug": "virtlauncher",
+        "image": "readystack/virtlauncher:v1.9.1-CE-centos9-r2",
+        "image_manifest_digest": "sha256:82b0f82d8ee0f235b6ad7e1c695ea8f15ce64f8385363c824b31697af6111433",
+        "index_digest": "sha256:dc4d5c877e95631e0ea31ecffb09b235ce7499f6d27d7cea41972d9e020c2bb0",
+        "output_basis": "the published release (Docker Hub, pushed 2026-11-09; chain 878, G8 rebuilt its kit offline to this digest before publishing): cosign-signed, with SLSA v1 provenance and an SPDX SBOM attached. Both digests read from Docker Hub on 2026-11-09 (the tag's index and its linux/amd64 image manifest, through the registry and the Hub tag API, which agree); the stack's acceptance run mirrors and verifies this digest. An unlisted release (not on readystack.dev): its disclosure record (docs/provenance/SCAN_GRADE.json in the release, scanned 2026-11-09) gives each fixable critical or high finding its disposition, the real ones glibc CVE-2026-86805 and CVE-2026-95818 (glibc 2.34-277.el9, fixed in CentOS Stream 9's 2.34-286.el9 after this build's package lock) and libcap CVE-2026-4878 (fixed in RHEL 9, not yet in CentOS Stream 9)",
+        "previous": {
+          "image": "readystack/virtlauncher:v1.9.1-CE-centos9-r1",
+          "image_manifest_digest": "sha256:6de4ce2585821a53b982a15956d479b6edc46efcf6eeb7f5ca2dd6a37aa921c9",
+          "_note": "the release the stack's r1 and r2 bundles pinned (its own 2026-10-28/29 proof is in this file's git history and docs/KUBEVIRT_STACK.md)"
+        }
+      }
+    },
+    {
+      "n": 25,
+      "item": "registry",
+      "kind": "image",
+      "from": "existing readystack/registry kit",
+      "profile": "standard-nonroot",
+      "owner_agent": "reuse",
+      "output": "readystack/registry:v3.1.2-CE-ubuntu24.04-r6",
+      "_output_note": "the newest readystack/registry release (r6, pushed 2026-11-07, index sha256:abfab9aa..., linux/amd64 sha256:7c073e4c...); the install bundle names it only as readystack/registry:<release tag>, and the hosts never pull it"
+    },
+    {
+      "n": 26,
+      "item": "virt-exportproxy",
+      "kind": "image",
+      "component_check": true,
+      "from": "kubevirt",
+      "profile": "standard-nonroot",
+      "owner_agent": "kubevirt",
+      "output": {
+        "slug": "virtexportproxy",
+        "image": "readystack/virtexportproxy:v1.9.1-CE-debian12-r2",
+        "image_manifest_digest": "sha256:0a8159ff7b2d56c76cdf5645a26c1864fc4bff123b2349adf89e90fa7a60ca6e",
+        "index_digest": "sha256:e6d850f11fc9cbb74db943c416eb2fbdc82c5ccdf431c709631ab02f78a9bbdc",
+        "output_basis": "the published release (Docker Hub, pushed 2026-11-08; chain 876, G8 rebuilt its kit offline to this digest before publishing): cosign-signed, with SLSA v1 provenance and an SPDX SBOM attached. Both digests read from Docker Hub on 2026-11-09 (the tag's index and its linux/amd64 image manifest, through the registry and the Hub tag API, which agree); the stack's acceptance run mirrors and verifies this digest",
+        "previous": {
+          "image": "readystack/virtexportproxy:v1.9.1-CE-debian12-r1",
+          "image_manifest_digest": "sha256:3bb06b5880899bf2955da20fb6c47810f0a863a9057c0c9ec13f61a3a624322b",
+          "_note": "the release the stack's r1 and r2 bundles pinned (its own 2026-10-28/29 proof is in this file's git history and docs/KUBEVIRT_STACK.md)"
+        }
+      },
+      "_why": "not in the DevOps request, but KubeVirt v1.9.1's virt-operator always deploys it (install/strategy.go appends it unconditionally; reconcile.go waits for it before KubeVirt is Available); owner 2026-10-28"
+    }
+  ],
+  "product": {
+    "slug": "kubernetesvmstack",
+    "name": "Kubernetes VM Stack",
+    "strategy": "strategies/kubernetesvmstack.json",
+    "kit": [
+      "product-kits/kubevirt-stack/install/",
+      "registry/stacks/kubevirt-stack.json"
+    ],
+    "_note": "The stack itself as a product (owner 2026-10-29, docs/KUBEVIRT_STACK.md Option 1), shipped as a FROM-scratch image of its bundle (owner 2026-10-29): the install bundle, this pin manifest and the operator runbook, with stack-bundle, the program that checks them (product-kits/kubernetesvmstack/build/, scripts/stack-bundle.py). It is not an item of this manifest, so it is not a runbook component; component_check here lets its image use the one-run component check (release/component_boot.py: `stack-bundle verify`), as a host bundle does. Its own image digest is never recorded in this manifest: the image holds this file, so recording it would change the image it names.",
+    "image": "readystack/kubernetesvmstack:v1.36.6-kubevirt1.9.1-CE-scratch-r3",
+    "component_check": true
+  },
+  "runbook": {
+    "source": "product-kits/kubevirt-stack/runbook/RUNBOOK.src.md",
+    "facts": "product-kits/kubevirt-stack/runbook/facts.json",
+    "rebuilds": "product-kits/kubevirt-stack/runbook/rebuilds.json",
+    "evidence": {
+      "path": "product-kits/kubevirt-stack/runbook/evidence/2026-10-29/RUNBOOK_EVIDENCE.json",
+      "sha256": "4f8a09a641e88882f986184803a1e53dfc6cfbb20e0b4540ecf449b1eb40f5be",
+      "recorded_at": "2026-10-29T13:44:31Z"
+    },
+    "_note": "The operator runbook (orchestrator/stack_docs.py, release/stack_runbook.py). The stack product's DOCUMENT run (scripts/stack-document.py) reads every fact and runs every check of `source` on the integration cluster and records it; `evidence` then names that record, committed under product-kits/kubevirt-stack/runbook/evidence/, with its sha256 ({path, sha256}). Every item that sets component_check gets its handbook, data and interface documents from the source and that record, filtered to the sections and checks that name it: its DOCUMENT track boots nothing (orchestrator/instance.make_instance). null until the first run is committed: until then those components' DOCUMENT stages stop with an action row."
+  }
+}

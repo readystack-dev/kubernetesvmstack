@@ -1,0 +1,9 @@
+# kubeadm patch file (kubeadm's naming: <target>[suffix][+patchtype].yaml; target kube-scheduler, strategic merge),
+# read from /etc/kubernetes/patches by kubeadm init, join and upgrade (patches.directory in kubeadm-config.yaml).
+# Our kube-scheduler image runs as the non-root user kube (999:999) by default (root is set by the
+# Pod). It reads /etc/kubernetes/scheduler.conf, which kubeadm writes mode 0600 root: without this patch it
+# exits at start with "permission denied".
+spec:
+  securityContext:
+    runAsUser: 0
+    runAsGroup: 0

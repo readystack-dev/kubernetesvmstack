@@ -1,0 +1,11 @@
+image_manifest_digest=sha256:ec9e9b8a463dbe23ef50afe9b608db2b9ddc2e2a23367a6e6d788435e096b0b4
+config_digest=sha256:1fd7e9139af282febb10ce09f8572ce7fdc13c6bf2040440f94f453e8ba1a200
+tag=readystack/kubernetesvmstack:v1.36.6-kubevirt1.9.1-CE-scratch-r3
+probe_port=80
+probe_path=/
+probe_timeout=180
+probe_exec=['/usr/local/bin/stack-bundle', 'verify']
+verify_boot=oneshot
+verify_oneshot_arg=/usr/local/bin/stack-bundle
+verify_oneshot_arg=verify
+verify_oneshot_expect=files verified

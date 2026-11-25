@@ -1,0 +1,48 @@
+# Example NetworkAttachmentDefinition for the ReadyStack Kubernetes VM stack (install order: README.md in the install directory):
+# attaches a KubeVirt VM to a Linux bridge that already exists on every node (${HOST_BRIDGE}: br0, the bridge
+# bridge-netplan.example.yaml puts on the node's uplink, with the host's own address), so the VM sits on the hosts' LAN
+# next to its flannel pod interface.
+#
+# Multus (multus-daemonset.yml) reads this and calls the bridge CNI plugin (the stack's cni-plugins build, installed in
+# /opt/cni/bin by the node bundle). "ipam": {} leaves the pod side of the link without an address: KubeVirt's bridge
+# binding hands the layer-2 link to the VM, which takes its address from the host network (DHCP or static) as a VM on
+# that bridge would without Kubernetes.
+#
+# The definition lives in the VM's namespace (default here). A VM uses it with:
+#   spec:
+#     template:
+#       spec:
+#         domain:
+#           devices:
+#             interfaces:
+#             - name: default
+#               masquerade: {}
+#             - name: hostnet
+#               bridge: {}
+#         networks:
+#         - name: default
+#           pod: {}
+#         - name: hostnet
+#           multus:
+#             networkName: host-bridge
+#
+# Placeholder (substituted by the install bundle, e.g. envsubst):
+#   ${HOST_BRIDGE}   the bridge device on every node: br0 (bridge-netplan.example.yaml's ${BRIDGE})
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  name: host-bridge
+  namespace: default
+spec:
+  config: |
+    {
+      "cniVersion": "1.0.0",
+      "name": "host-bridge",
+      "plugins": [
+        {
+          "type": "bridge",
+          "bridge": "${HOST_BRIDGE}",
+          "ipam": {}
+        }
+      ]
+    }
