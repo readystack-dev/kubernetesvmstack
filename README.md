@@ -5,7 +5,34 @@ The offline build kit for the Docker image `readystack/kubernetesvmstack:v1.36.6
 - Release: [v1.36.6-kubevirt1.9.1-CE-scratch-r3](https://github.com/readystack-dev/kubernetesvmstack/releases/tag/v1.36.6-kubevirt1.9.1-CE-scratch-r3)
 - Image: [`docker.io/readystack/kubernetesvmstack:v1.36.6-kubevirt1.9.1-CE-scratch-r3`](https://hub.docker.com/r/readystack/kubernetesvmstack/tags), manifest digest `sha256:ec9e9b8a463dbe23ef50afe9b608db2b9ddc2e2a23367a6e6d788435e096b0b4`
 - Product page: https://readystack.dev/products/kubernetesvmstack
+- Source and build recipe: https://readystack.dev/products/kubernetesvmstack/recipe
+- Build trail: https://readystack.dev/products/kubernetesvmstack/trail/v1.36.6-kubevirt1.9.1-CE-scratch-r3
 - Defects: this repository's Issues (defects recorded from 25 November 2026 on) and https://readystack.dev/defects.html?product=kubernetesvmstack
+
+## The image
+
+Not a service: the image's filesystem is the bundle. Take it out with docker create and docker cp <container>:/kubernetesvmstack, then follow install/README.md; the operator runbook is runbook/RUNBOOK.md in the bundle, the same text as docs/admin-guide/ADMIN_HANDBOOK.md in the build kit; each image the stack installs is its own product.
+
+## Who uses Kubernetes VM Stack and why
+
+Teams that run a fleet of virtual machines on their own hardware and want them managed beside their containers.
+
+Kubernetes with KubeVirt adds virtual machines to the Kubernetes API: one API and one set of manifests for virtual machines and containers, on the same cluster and nodes.
+
+A typical use: A team has applications that still need full virtual machines and new services built as containers. On one Kubernetes cluster with KubeVirt they create, start, stop and migrate the virtual machines through the same Kubernetes API as their pods, and can move the VM workloads into containers over time.
+
+From the upstream project's own description: https://kubevirt.io/, https://kubevirt.io/user-guide/, https://github.com/kubevirt/kubevirt, https://kubernetes.io/docs/concepts/overview/.
+
+## This release
+
+- Docker Scout policy grade at release: **A** (100%), graded 2026-11-09 with `docker scout policy` (CLI 1.26.0, docker-default configuration).
+- Signed with ReadyStack's release key (fingerprint `04daa92344a52dbc`): https://readystack.dev/keys/cosign.pub.
+- Runs as a non-root user (`65534:65534`).
+- Attestations on the image: an SPDX SBOM and SLSA provenance v1.
+- Rebuilt from this kit with network egress blocked on 2026-11-09; the rebuilt image digest is the published one.
+- Base: scratch.
+
+The current grade, measured again every day, is on https://readystack.dev/products/kubernetesvmstack.
 
 Kubernetes VM Stack is distributed under its upstream licence (Apache-2.0); the kit contains upstream's source under that licence, and each vendored component under its own.
 
@@ -39,3 +66,5 @@ The build trail (`ReadyStack-kubernetesvmstack-v1.36.6-kubevirt1.9.1-CE-scratch-
 ## This repository
 
 `recipe/` holds the kit's recipe files (Dockerfiles, build scripts, pins) as published at https://readystack.dev/products/kubernetesvmstack/recipe. The complete kit is the release download. Each release is a tag here.
+
+— ReadyStack · https://readystack.dev
